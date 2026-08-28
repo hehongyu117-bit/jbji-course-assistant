@@ -28,7 +28,7 @@ function arrange(events:TimetableEvent[]):LaidEvent[]{
   return result;
 }
 
-const kindLabels={common:'伯大课程',shared:'专业共享',major:'专业课程',optional:'选修课程'};
+const kindLabels={common:'伯大课程',shared:'专业共享',major:'暨大课程',optional:'选修课程'};
 
 function audienceLabel(event:TimetableEvent){
   if(event.majors==='all')return '';
@@ -70,7 +70,7 @@ export default function Home(){
       {classCount>0&&<div className="filterGroup classGroup"><span>班级</span><div className="segmented">{Array.from({length:classCount},(_,i)=>i+1).map((item)=><button key={item} className={classNo===item?'active':''} onClick={()=>setClassNo(item)}>{item} 班</button>)}</div></div>}
     </section>
     <section className="contextBar"><span>正在查看</span><strong>{degreeLabels[track]} · 大{['一','二','三','四'][year-1]} · {selectedMajor.name}{classCount?` · ${classNo} 班`:''}</strong><small>{track==='single'&&year<=3?'已替换为单学位伯大必修模块':year===1?'英语分组已按 E1–E12 对应到专业班级':year===2?'雅思分组已按 E1–E8 对应到专业班级':'本年级不区分英语班级组'}</small></section>
-    <section className="scheduleSection"><div className="sectionHead"><div><p className="eyebrow">{degreeLabels[track].toUpperCase()} · YEAR {year} · {groupLabel}</p><h2>{selectedMajor.name} · {degreeLabels[track]}课表</h2></div><div className="legend"><span><i className="dot common"/>伯大课程</span><span><i className="dot shared"/>专业共享</span><span><i className="dot own"/>专业课程</span><span><i className="dot optional"/>选修课程</span></div></div>
+    <section className="scheduleSection"><div className="sectionHead"><div><p className="eyebrow">{degreeLabels[track].toUpperCase()} · YEAR {year} · {groupLabel}</p><h2>{selectedMajor.name} · {degreeLabels[track]}课表</h2></div><div className="legend"><span><i className="dot common"/>伯大课程</span><span><i className="dot shared"/>专业共享</span><span><i className="dot own"/>暨大课程</span><span><i className="dot optional"/>选修课程</span></div></div>
       <div className="tableScroll"><div className="timetable"><div className="corner">节次</div>{['周一','周二','周三','周四','周五'].map((day,index)=><div className="dayHead" style={{gridColumn:index+2}} key={day}>{day}<small>{['MON','TUE','WED','THU','FRI'][index]}</small></div>)}
         {times.map(([session,from,to],index)=><div className={`timeCell ${session==='5'?'break':''}`} style={{gridRow:index+2}} key={session}><strong>{session}</strong><span>{from}</span>{to&&<small>{to}</small>}</div>)}
         {times.map((_,row)=>[0,1,2,3,4].map((day)=><div className={`gridCell ${row===4?'break':''}`} style={{gridColumn:day+2,gridRow:row+2}} key={`${day}-${row}`}/>))}
