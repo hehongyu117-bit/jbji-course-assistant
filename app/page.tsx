@@ -28,7 +28,7 @@ function arrange(events:TimetableEvent[]):LaidEvent[]{
   return result;
 }
 
-const kindLabels={common:'伯大课程',shared:'专业共享',major:'暨大课程',optional:'选修课程'};
+const kindLabels={common:'伯大课程',shared:'专业共享',major:'暨大课程',optional:'选修课程',general:'通识课'};
 
 function audienceLabel(event:TimetableEvent){
   if(event.majors==='all')return '';
@@ -56,7 +56,8 @@ export default function Home(){
     if(event.groups&&classCount&&!event.groups.includes(`${major}${classNo}`))return false;
     return true;
   }),[track,year,major,classNo,classCount]);
-  const events=useMemo(()=>arrange(filtered),[filtered]);
+  const scheduled=useMemo(()=>filtered.filter((event)=>!event.listedOnly),[filtered]);
+  const events=useMemo(()=>arrange(scheduled),[scheduled]);
   const courses=useMemo(()=>Array.from(new Map(filtered.map((event)=>[event.title,event])).values()).sort((a,b)=>a.kind.localeCompare(b.kind)||a.title.localeCompare(b.title,'zh-CN')),[filtered]);
   const groupLabel=classCount?`${selectedMajor.label}${classNo}`:selectedMajor.label;
 
@@ -76,7 +77,7 @@ export default function Home(){
         {times.map((_,row)=>[0,1,2,3,4].map((day)=><div className={`gridCell ${row===4?'break':''}`} style={{gridColumn:day+2,gridRow:row+2}} key={`${day}-${row}`}/>))}
         {events.map((event)=><article className={`courseBlock tone-${event.kind}`} style={{gridColumn:event.day+2,gridRow:`${event.start+2} / span ${event.span}`,width:`calc((100% - 6px) / ${event.laneCount})`,marginLeft:`calc(${event.lane} * (100% / ${event.laneCount}) + 3px)`}} key={event.id} title={event.note}><span className="courseTag">{event.note||kindLabels[event.kind]}{trackLabel(event)&&` · ${trackLabel(event)}`}{audienceLabel(event)&&` · (${audienceLabel(event)})`}</span><strong>{event.title}</strong>{event.english&&<small>{event.english}</small>}<em>{event.room||'地点待通知'}{event.teacher?` · ${event.teacher}`:''}{event.weeks?` · ${event.weeks}`:''}</em></article>)}
       </div></div>
-      {events.length===0&&<div className="emptyState">当前组合暂未录入课程，请核对年级与专业。</div>}
+      {events.length===0&&<div className="emptyState">当前组合暂无已公布上课时间的课程。</div>}
     </section>
     <section className="courseSection"><div className="sectionHead compact"><div><p className="eyebrow">COURSE OVERVIEW</p><h2>本组合课程清单</h2></div><strong className="countBadge">{courses.length} 门</strong></div><div className="courseList">{courses.map((course)=><article className={`courseItem tone-${course.kind}`} key={course.title}><div><span>{kindLabels[course.kind]}{trackLabel(course)&&` · ${trackLabel(course)}`}{audienceLabel(course)&&` · (${audienceLabel(course)})`}</span><strong>{course.title}</strong>{course.english&&<small>{course.english}</small>}</div><div className="courseMeta">{course.weeks&&<b>{course.weeks}</b>}{course.teacher&&<em>{course.teacher}</em>}{course.note&&<em>{course.note}</em>}</div></article>)}</div></section>
     <aside className="notice"><strong>使用说明</strong><p>双学位模式采用原课表中的 All Progs 数学模块；单学位模式会移除这些模块及其 Seminar，并换成单学位授课安排中的 RA、SAS、FM、MVA、GTMCD 与 IPCO。其他暨大学位课程仍按年级、专业和班级筛选。教室或周次有调整时，以学院最新通知为准。</p></aside>

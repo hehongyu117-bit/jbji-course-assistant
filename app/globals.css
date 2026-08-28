@@ -85,6 +85,7 @@ h1 { margin:0; max-width:800px; font-family:Georgia,"Songti SC",serif; font-size
 .tone-shared { background:#fde8ed; border-color:var(--red); }
 .tone-major { background:#e9eef8; border-color:var(--blue); }
 .tone-optional { background:#eeeeee; border-color:#666; }
+.tone-general { background:#edf4ea; border-color:#66855a; }
 .emptyState { padding:36px; text-align:center; color:var(--muted); font-size:12px; }
 .countBadge { padding:7px 11px; border-radius:2px; background:var(--orange); color:#fff; font-family:Georgia,serif; font-size:11px; }
 .courseList { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }

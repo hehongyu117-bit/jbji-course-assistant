@@ -1,10 +1,10 @@
 export type Major='MAM'|'ICS'|'Econ'|'Stat';
 export type DegreeTrack='dual'|'single';
-export type CourseKind='common'|'shared'|'major'|'optional';
+export type CourseKind='common'|'shared'|'major'|'optional'|'general';
 export type TimetableEvent={
   id:string; year:number; title:string; english?:string; day:number; start:number; span:number;
   room?:string; majors:Major[]|'all'; groups?:string[]; kind:CourseKind; weeks?:string; note?:string;
-  track?:DegreeTrack; teacher?:string;
+  track?:DegreeTrack; teacher?:string; listedOnly?:boolean;
 };
 
 const y1English:TimetableEvent[]=[
@@ -37,7 +37,7 @@ export const timetableEvents:TimetableEvent[]=[
   {id:'y1-ide-es',year:1,title:'思想道德与法治',english:'Ideological Morality and Rule of Law',day:2,start:9,span:2,room:'N415',majors:['Econ','Stat'],kind:'shared',weeks:'4–18周'},
   {id:'y1-military-mi',year:1,title:'军事理论与国家安全教育',day:4,start:2,span:2,room:'N415',majors:['MAM','ICS'],kind:'shared',weeks:'4–18周'},
   {id:'y1-military-es',year:1,title:'军事理论与国家安全教育',day:4,start:5,span:2,room:'N415',majors:['Econ','Stat'],kind:'shared',weeks:'4–18周'},
-  {id:'y1-art',year:1,title:'艺术体验与审美鉴赏',day:3,start:7,span:2,room:'待通知',majors:'all',kind:'common'},
+  {id:'y1-art',year:1,title:'艺术体验与审美鉴赏',day:3,start:7,span:2,majors:'all',kind:'general',listedOnly:true},
   {id:'y1-mental-mam',year:1,title:'大学生心理健康',day:3,start:2,span:2,room:'待通知',majors:['MAM'],kind:'major',weeks:'4–18周'},
   {id:'y1-mental-ics',year:1,title:'大学生心理健康',day:3,start:2,span:2,room:'待通知',majors:['ICS'],kind:'major',weeks:'4–18周'},
   {id:'y1-mental-econ',year:1,title:'大学生心理健康',day:2,start:5,span:2,room:'待通知',majors:['Econ'],kind:'major',weeks:'4–18周'},
