@@ -54,8 +54,8 @@ export default function Home(){
   const groupLabel=classCount?`${selectedMajor.label}${classNo}`:selectedMajor.label;
 
   return <main>
-    <header className="topbar"><a className="brand" href="#top"><span className="brandMark">J</span><span><strong>JBJI 课表</strong><small>2026–27 学年 · 第一学期</small></span></a><span className="sourceBadge">资料日期：2026-08-24 · 5 页总表</span></header>
-    <section className="hero" id="top"><div><p className="eyebrow">PERSONAL TIMETABLE</p><h1>从混排总表，到你的专属课表。</h1><p className="lead">选择年级、专业与班级，只保留与你相关的课程。伯大课程、专业共享课和英语分组会自动归入同一张表。</p></div><div className="heroStat"><strong>{courses.length}</strong><span>当前课程</span></div></section>
+    <header className="topbar"><a className="brand" href="#top"><span className="brandMark"><b>J</b><b>B</b></span><span><strong>暨南大学伯明翰大学联合学院</strong><small>JINAN · BIRMINGHAM JOINT INSTITUTE</small></span></a><span className="sourceBadge"><b>2026–27</b><span>第一学期本科课表</span></span></header>
+    <section className="hero" id="top"><div className="heroCopy"><p className="eyebrow">JINAN × BIRMINGHAM · PERSONAL TIMETABLE</p><h1>一张课表，<br/>看清你的暨伯学期。</h1><p className="lead">选择年级、专业与班级，只保留与你相关的课程。伯大课程、专业共享课和英语分组会自动归入同一张表。</p><div className="heroRule"><span>数学交叉</span><span>双校培养</span><span>四个本科专业</span></div></div><div className="heroStat"><span>当前组合</span><strong>{courses.length}</strong><small>COURSES</small></div></section>
     <section className="filterPanel" aria-label="课表筛选">
       <div className="filterGroup"><span>年级</span><div className="segmented">{[1,2,3,4].map((item)=><button key={item} className={year===item?'active':''} onClick={()=>setYear(item)}>大{['一','二','三','四'][item-1]}</button>)}</div></div>
       <div className="filterGroup majorGroup"><span>专业</span><div className="segmented">{majors.map((item)=><button key={item.id} className={major===item.id?'active':''} onClick={()=>setMajor(item.id)}><b>{item.label}</b><small>{item.name}</small></button>)}</div></div>
@@ -72,6 +72,6 @@ export default function Home(){
     </section>
     <section className="courseSection"><div className="sectionHead compact"><div><p className="eyebrow">COURSE OVERVIEW</p><h2>本组合课程清单</h2></div><strong className="countBadge">{courses.length} 门</strong></div><div className="courseList">{courses.map((course)=><article className={`courseItem tone-${course.kind}`} key={course.title}><div><span>{kindLabels[course.kind]}{audienceLabel(course)&&` · (${audienceLabel(course)})`}</span><strong>{course.title}</strong>{course.english&&<small>{course.english}</small>}</div><div className="courseMeta">{course.weeks&&<b>{course.weeks}</b>}{course.note&&<em>{course.note}</em>}</div></article>)}</div></section>
     <aside className="notice"><strong>使用说明</strong><p>本页依据原始 PDF 课表整理，已将 All Progs、MAM/ICS、ECON/STAT 以及单专业课程重新归类。标为“选修”的课程可能需要在同一时段内择一；教室或周次有调整时，以学院最新通知为准。</p></aside>
-    <footer>非官方课表工具 · 数据来源：26-27-1-JBJI-Timetable.pdf · 课程安排请以学院最新通知为准</footer>
+    <footer><span>JBJI STUDENT TIMETABLE · 非官方学生工具</span><span>数据来源：26-27-1-JBJI-Timetable.pdf</span><a href="https://birmingham.jnu.edu.cn/" target="_blank" rel="noreferrer">学院官网 ↗</a></footer>
   </main>;
 }
