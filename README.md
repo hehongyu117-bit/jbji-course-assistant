@@ -32,3 +32,5 @@ npm run build
 ## 开源许可
 
 代码以 MIT License 开源。课程与教务信息仅供查阅，最终安排以学院通知为准。
+
+`public/jbji-logo.png` 与 `public/jbji-banner.jpg` 来源于[暨南大学伯明翰大学联合学院官网](https://birmingham.jnu.edu.cn/)，相关校徽、名称与图片权利归暨南大学、伯明翰大学及学院所有，不包含在本项目的 MIT 软件许可中。本项目为非官方学生工具。

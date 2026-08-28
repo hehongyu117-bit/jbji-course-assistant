@@ -54,8 +54,8 @@ export default function Home(){
   const groupLabel=classCount?`${selectedMajor.label}${classNo}`:selectedMajor.label;
 
   return <main>
-    <header className="topbar"><a className="brand" href="#top"><span className="brandMark"><b>J</b><b>B</b></span><span><strong>暨南大学伯明翰大学联合学院</strong><small>JINAN · BIRMINGHAM JOINT INSTITUTE</small></span></a><span className="sourceBadge"><b>2026–27</b><span>第一学期本科课表</span></span></header>
-    <section className="hero" id="top"><div className="heroCopy"><p className="eyebrow">JINAN × BIRMINGHAM · PERSONAL TIMETABLE</p><h1>一张课表，<br/>看清你的暨伯学期。</h1><p className="lead">选择年级、专业与班级，只保留与你相关的课程。伯大课程、专业共享课和英语分组会自动归入同一张表。</p><div className="heroRule"><span>数学交叉</span><span>双校培养</span><span>四个本科专业</span></div></div><div className="heroStat"><span>当前组合</span><strong>{courses.length}</strong><small>COURSES</small></div></section>
+    <header className="topbar"><a className="brand" href="#top"><img className="brandLogo" src="./jbji-logo.png" alt="暨南大学伯明翰大学联合学院院徽"/></a><span className="sourceBadge"><b>本科课表</b><span>2026–27 学年 · 第一学期</span></span></header>
+    <section className="hero" id="top"><div className="heroBackdrop" aria-hidden="true"><img src="./jbji-banner.jpg" alt=""/></div><div className="heroCopy"><p className="eyebrow">JBJI PERSONAL TIMETABLE</p><h1>一张课表，<br/>看清你的暨伯学期。</h1><p className="lead">选择年级、专业与班级，只保留与你相关的课程。伯大课程、专业共享课和英语分组会自动归入同一张表。</p><div className="heroRule"><span>数学交叉</span><span>双校培养</span><span>四个本科专业</span></div></div><div className="heroStat"><span>当前组合</span><strong>{courses.length}</strong><small>COURSES</small></div></section>
     <section className="filterPanel" aria-label="课表筛选">
       <div className="filterGroup"><span>年级</span><div className="segmented">{[1,2,3,4].map((item)=><button key={item} className={year===item?'active':''} onClick={()=>setYear(item)}>大{['一','二','三','四'][item-1]}</button>)}</div></div>
       <div className="filterGroup majorGroup"><span>专业</span><div className="segmented">{majors.map((item)=><button key={item.id} className={major===item.id?'active':''} onClick={()=>setMajor(item.id)}><b>{item.label}</b><small>{item.name}</small></button>)}</div></div>
