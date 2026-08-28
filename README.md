@@ -1,6 +1,6 @@
 # JBJI Course Assistant
 
-面向 JBJI 本科生的课表筛选页面。可以按年级、专业和班级查看专属课程，数据来自 2026–27 学年第一学期课表。
+面向 JBJI 本科生的课表筛选页面。可以按双学位/单学位、年级、专业和班级查看专属课程，数据来自 2026–27 学年第一学期课表与单学位伯大必修课程授课安排。
 
 在线访问：<https://hehongyu117-bit.github.io/jbji-course-assistant/>
 
@@ -27,7 +27,7 @@ npm run build
 
 ## 数据说明
 
-当前课程数据维护在 `app/timetable-data.ts`。学校发布新课表后，只需更新这个文件并推送即可。
+当前课程数据维护在 `app/timetable-data.ts`。带有 `track: 'dual'` 或 `track: 'single'` 的课程只在对应学位类型下显示；未标记的暨大学位课程由两类学生共用。学校发布新课表后，只需更新这个文件并推送即可。
 
 ## 开源许可
 

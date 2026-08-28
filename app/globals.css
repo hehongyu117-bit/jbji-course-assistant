@@ -30,7 +30,7 @@ h1 { margin:0; max-width:800px; font-family:Georgia,"Songti SC",serif; font-size
 .heroStat strong { font-family:Georgia,serif; font-size:64px; color:#fff; line-height:1; }
 .heroStat span,.heroStat small { color:#fff; font-size:9px; letter-spacing:.12em; }
 .heroStat small { margin-top:5px; }
-.filterPanel { position:relative; z-index:6; margin-top:-20px; background:#fff; border:1px solid #dedede; border-top:4px solid var(--orange); border-radius:2px; padding:20px; display:grid; grid-template-columns:auto 1fr auto; gap:22px; box-shadow:0 18px 38px rgba(35,35,35,.09); }
+.filterPanel { position:relative; z-index:6; margin-top:-20px; background:#fff; border:1px solid #dedede; border-top:4px solid var(--orange); border-radius:2px; padding:20px; display:grid; grid-template-columns:auto auto 1fr auto; gap:18px; box-shadow:0 18px 38px rgba(35,35,35,.09); }
 .filterGroup>span { display:block; margin:0 0 9px 2px; color:var(--orange); font-size:9px; font-weight:900; letter-spacing:.14em; }
 .segmented { display:flex; gap:6px; flex-wrap:wrap; }
 .segmented button { border:1px solid #d9ddd8; background:#f8f8f4; min-height:45px; border-radius:3px; padding:8px 14px; cursor:pointer; transition:.18s ease; }
@@ -42,6 +42,8 @@ h1 { margin:0; max-width:800px; font-family:Georgia,"Songti SC",serif; font-size
 .segmented button small { margin-top:2px; font-size:9px; opacity:.75; }
 .majorGroup .segmented { flex-wrap:nowrap; }
 .majorGroup .segmented button { min-width:112px; }
+.trackGroup .segmented { flex-wrap:nowrap; }
+.trackGroup .segmented button { min-width:96px; }
 .classGroup .segmented button { min-width:58px; }
 .contextBar { margin-top:12px; padding:11px 16px; display:flex; align-items:center; gap:10px; color:#c8c8c8; font-size:9px; letter-spacing:.04em; background:#333; border-left:5px solid var(--orange); }
 .contextBar strong { color:#fff; font-size:11px; }

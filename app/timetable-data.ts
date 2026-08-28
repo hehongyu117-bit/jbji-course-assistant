@@ -1,8 +1,10 @@
 export type Major='MAM'|'ICS'|'Econ'|'Stat';
+export type DegreeTrack='dual'|'single';
 export type CourseKind='common'|'shared'|'major'|'optional';
 export type TimetableEvent={
   id:string; year:number; title:string; english?:string; day:number; start:number; span:number;
   room?:string; majors:Major[]|'all'; groups?:string[]; kind:CourseKind; weeks?:string; note?:string;
+  track?:DegreeTrack; teacher?:string;
 };
 
 const y1English:TimetableEvent[]=[
@@ -23,12 +25,14 @@ const y1English:TimetableEvent[]=[
 export const timetableEvents:TimetableEvent[]=[
   ...y1English,
   {id:'y1-pe',year:1,title:'体育 I',english:'P.E I',day:0,start:0,span:2,room:'体育场馆',majors:['MAM','ICS'],kind:'shared',weeks:'4–18周'},
-  {id:'y1-found-mi-1',year:1,title:'微积分数学基础 / 序列与级数',english:'MFC / SAS',day:0,start:2,span:2,room:'N315',majors:['MAM','ICS'],kind:'shared',weeks:'4–16周'},
-  {id:'y1-found-es-1',year:1,title:'微积分数学基础 / 序列与级数',english:'MFC / SAS',day:0,start:0,span:2,room:'N315',majors:['Econ','Stat'],kind:'shared',weeks:'4–16周'},
-  {id:'y1-found-mi-2',year:1,title:'MFC / SAS 课程',day:2,start:5,span:2,room:'N315',majors:['MAM','ICS'],kind:'shared',weeks:'4–16周'},
-  {id:'y1-found-es-2',year:1,title:'MFC / SAS 课程',day:2,start:0,span:2,room:'N315',majors:['Econ','Stat'],kind:'shared',weeks:'4–16周'},
-  {id:'y1-found-mi-3',year:1,title:'MFC / SAS Seminar',day:3,start:5,span:2,room:'N415',majors:['MAM','ICS'],kind:'shared',weeks:'4–16周'},
-  {id:'y1-found-es-3',year:1,title:'MFC / SAS Seminar',day:3,start:9,span:2,room:'N415',majors:['Econ','Stat'],kind:'shared',weeks:'4–16周'},
+  {id:'y1-found-mi-1',year:1,title:'微积分数学基础 / 序列与级数',english:'MFC / SAS',day:0,start:2,span:2,room:'N315',majors:['MAM','ICS'],kind:'shared',weeks:'4–16周',track:'dual'},
+  {id:'y1-found-es-1',year:1,title:'微积分数学基础 / 序列与级数',english:'MFC / SAS',day:0,start:0,span:2,room:'N315',majors:['Econ','Stat'],kind:'shared',weeks:'4–16周',track:'dual'},
+  {id:'y1-found-mi-2',year:1,title:'MFC / SAS 课程',day:2,start:5,span:2,room:'N315',majors:['MAM','ICS'],kind:'shared',weeks:'4–16周',track:'dual'},
+  {id:'y1-found-es-2',year:1,title:'MFC / SAS 课程',day:2,start:0,span:2,room:'N315',majors:['Econ','Stat'],kind:'shared',weeks:'4–16周',track:'dual'},
+  {id:'y1-found-mi-3',year:1,title:'MFC / SAS Seminar',day:3,start:5,span:2,room:'N415',majors:['MAM','ICS'],kind:'shared',weeks:'4–16周',track:'dual'},
+  {id:'y1-found-es-3',year:1,title:'MFC / SAS Seminar',day:3,start:9,span:2,room:'N415',majors:['Econ','Stat'],kind:'shared',weeks:'4–16周',track:'dual'},
+  {id:'y1-single-ra',year:1,title:'实分析',english:'RA · Real Analysis',day:1,start:1,span:3,room:'知产218',majors:'all',kind:'common',weeks:'6–17周',track:'single',teacher:'肖亮海'},
+  {id:'y1-single-sas',year:1,title:'序列与级数',english:'SAS · Sequences and Series',day:1,start:7,span:2,room:'N423',majors:'all',kind:'common',weeks:'6–14周',track:'single',teacher:'肖亮海'},
   {id:'y1-ide-mi',year:1,title:'思想道德与法治',english:'Ideological Morality and Rule of Law',day:2,start:5,span:2,room:'N415',majors:['MAM','ICS'],kind:'shared',weeks:'4–18周'},
   {id:'y1-ide-es',year:1,title:'思想道德与法治',english:'Ideological Morality and Rule of Law',day:2,start:9,span:2,room:'N415',majors:['Econ','Stat'],kind:'shared',weeks:'4–18周'},
   {id:'y1-military-mi',year:1,title:'军事理论与国家安全教育',day:4,start:2,span:2,room:'N415',majors:['MAM','ICS'],kind:'shared',weeks:'4–18周'},
@@ -47,14 +51,16 @@ export const timetableEvents:TimetableEvent[]=[
 
   {id:'y2-history-mi',year:2,title:'中国近现代史纲要',english:'Outline of Modern Chinese History',day:0,start:5,span:3,room:'N415',majors:['MAM','ICS'],kind:'shared',weeks:'1–18周'},
   {id:'y2-history-es',year:2,title:'中国近现代史纲要',day:0,start:9,span:3,room:'N415',majors:['Econ','Stat'],kind:'shared',weeks:'1–18周'},
-  {id:'y2-fmmva-mi-1',year:2,title:'金融数学 / 多元微积分与向量分析',english:'FM / MVA',day:1,start:0,span:2,room:'N315',majors:['MAM','ICS'],kind:'shared',weeks:'1–16周'},
-  {id:'y2-fmmva-es-1',year:2,title:'金融数学 / 多元微积分与向量分析',english:'FM / MVA',day:1,start:2,span:2,room:'N315',majors:['Econ','Stat'],kind:'shared',weeks:'1–16周'},
-  {id:'y2-fmmva-mi-2',year:2,title:'FM / MVA 课程',day:3,start:0,span:2,room:'N315',majors:['MAM','ICS'],kind:'shared',weeks:'1–16周'},
-  {id:'y2-fmmva-es-2',year:2,title:'FM / MVA 课程',day:3,start:2,span:2,room:'N315',majors:['Econ','Stat'],kind:'shared',weeks:'1–16周'},
-  {id:'y2-seminar-mi',year:2,title:'FM / MVA Seminar',day:1,start:7,span:2,room:'N315',majors:['MAM','ICS'],kind:'shared'},
-  {id:'y2-seminar-es',year:2,title:'FM / MVA Seminar',day:1,start:5,span:2,room:'N315',majors:['Econ','Stat'],kind:'shared'},
-  {id:'y2-seminar-fri-mi',year:2,title:'FM / MVA Seminar',day:4,start:0,span:2,room:'N415',majors:['MAM','ICS'],kind:'shared'},
-  {id:'y2-seminar-fri-es',year:2,title:'FM / MVA Seminar',day:4,start:0,span:2,room:'N415',majors:['Econ','Stat'],kind:'shared'},
+  {id:'y2-fmmva-mi-1',year:2,title:'金融数学 / 多元微积分与向量分析',english:'FM / MVA',day:1,start:0,span:2,room:'N315',majors:['MAM','ICS'],kind:'shared',weeks:'1–16周',track:'dual'},
+  {id:'y2-fmmva-es-1',year:2,title:'金融数学 / 多元微积分与向量分析',english:'FM / MVA',day:1,start:2,span:2,room:'N315',majors:['Econ','Stat'],kind:'shared',weeks:'1–16周',track:'dual'},
+  {id:'y2-fmmva-mi-2',year:2,title:'FM / MVA 课程',day:3,start:0,span:2,room:'N315',majors:['MAM','ICS'],kind:'shared',weeks:'1–16周',track:'dual'},
+  {id:'y2-fmmva-es-2',year:2,title:'FM / MVA 课程',day:3,start:2,span:2,room:'N315',majors:['Econ','Stat'],kind:'shared',weeks:'1–16周',track:'dual'},
+  {id:'y2-seminar-mi',year:2,title:'FM / MVA Seminar',day:1,start:7,span:2,room:'N315',majors:['MAM','ICS'],kind:'shared',track:'dual'},
+  {id:'y2-seminar-es',year:2,title:'FM / MVA Seminar',day:1,start:5,span:2,room:'N315',majors:['Econ','Stat'],kind:'shared',track:'dual'},
+  {id:'y2-seminar-fri-mi',year:2,title:'FM / MVA Seminar',day:4,start:0,span:2,room:'N415',majors:['MAM','ICS'],kind:'shared',track:'dual'},
+  {id:'y2-seminar-fri-es',year:2,title:'FM / MVA Seminar',day:4,start:0,span:2,room:'N415',majors:['Econ','Stat'],kind:'shared',track:'dual'},
+  {id:'y2-single-fm',year:2,title:'金融数学',english:'FM · Financial Mathematics',day:1,start:9,span:3,room:'N416',majors:'all',kind:'common',weeks:'6–17周',track:'single',teacher:'肖亮海'},
+  {id:'y2-single-mva',year:2,title:'多元与向量分析',english:'MVA · Multivariable & Vector Analysis',day:3,start:2,span:3,room:'N423',majors:'all',kind:'common',weeks:'6–17周',track:'single',teacher:'吴瑞雯'},
   {id:'y2-pe',year:2,title:'体育 II',english:'P.E II',day:2,start:0,span:2,room:'体育场馆',majors:['MAM','ICS'],kind:'shared',weeks:'1–18周'},
   {id:'y2-matlab',year:2,title:'Matlab程序设计',english:'Matlab Programming',day:2,start:2,span:2,room:'N217',majors:['MAM','ICS'],kind:'shared',weeks:'1–18周'},
   {id:'y2-matlab-lab',year:2,title:'Matlab程序设计实验',day:2,start:5,span:3,room:'MAM N504 / ICS N503',majors:['MAM','ICS'],kind:'shared',weeks:'1–18周'},
@@ -75,14 +81,16 @@ export const timetableEvents:TimetableEvent[]=[
   {id:'y2-ielts-78',year:2,title:'雅思课程',day:2,start:5,span:2,room:'E7 N432 / E8 N423',majors:['Stat'],groups:['Stat1','Stat2'],kind:'common',weeks:'1–18周'},
 
   {id:'y3-marx',year:3,title:'马克思主义基本原理',english:'Outline of Marxism Basic Principles',day:0,start:5,span:3,room:'Econ/Stat N315 · MAM/ICS N217',majors:'all',kind:'common',weeks:'1–18周'},
-  {id:'y3-ipco-es-tue',year:3,title:'整数规划及组合优化 / 博弈论与多准则决策',english:'IPCO / GTMCD',day:1,start:0,span:2,room:'N415',majors:['Econ','Stat'],kind:'shared',weeks:'1–16周'},
-  {id:'y3-ipco-mi-tue',year:3,title:'IPCO / GTMCD',day:1,start:2,span:2,room:'N415',majors:['MAM','ICS'],kind:'shared',weeks:'1–16周'},
-  {id:'y3-ipco-mi-wed',year:3,title:'IPCO / GTMCD',day:2,start:0,span:2,room:'N415',majors:['MAM','ICS'],kind:'shared',weeks:'1–16周'},
-  {id:'y3-ipco-es-wed',year:3,title:'IPCO / GTMCD',day:2,start:2,span:2,room:'N415',majors:['Econ','Stat'],kind:'shared',weeks:'1–16周'},
-  {id:'y3-ipco-mi-thu',year:3,title:'IPCO / GTMCD',day:3,start:0,span:2,room:'N415',majors:['MAM','ICS'],kind:'shared',weeks:'1–16周'},
-  {id:'y3-ipco-es-thu',year:3,title:'IPCO / GTMCD',day:3,start:2,span:2,room:'N415',majors:['Econ','Stat'],kind:'shared',weeks:'1–16周'},
-  {id:'y3-ipco-seminar',year:3,title:'IPCO / GTMCD Seminar & Q&A',day:1,start:5,span:3,room:'N217',majors:'all',kind:'common',weeks:'1–16周'},
-  {id:'y3-ipco-seminar-2',year:3,title:'IPCO / GTMCD Seminar & Q&A',day:3,start:5,span:4,room:'N419 / N415',majors:'all',kind:'common',weeks:'1–16周'},
+  {id:'y3-ipco-es-tue',year:3,title:'整数规划及组合优化 / 博弈论与多准则决策',english:'IPCO / GTMCD',day:1,start:0,span:2,room:'N415',majors:['Econ','Stat'],kind:'shared',weeks:'1–16周',track:'dual'},
+  {id:'y3-ipco-mi-tue',year:3,title:'IPCO / GTMCD',day:1,start:2,span:2,room:'N415',majors:['MAM','ICS'],kind:'shared',weeks:'1–16周',track:'dual'},
+  {id:'y3-ipco-mi-wed',year:3,title:'IPCO / GTMCD',day:2,start:0,span:2,room:'N415',majors:['MAM','ICS'],kind:'shared',weeks:'1–16周',track:'dual'},
+  {id:'y3-ipco-es-wed',year:3,title:'IPCO / GTMCD',day:2,start:2,span:2,room:'N415',majors:['Econ','Stat'],kind:'shared',weeks:'1–16周',track:'dual'},
+  {id:'y3-ipco-mi-thu',year:3,title:'IPCO / GTMCD',day:3,start:0,span:2,room:'N415',majors:['MAM','ICS'],kind:'shared',weeks:'1–16周',track:'dual'},
+  {id:'y3-ipco-es-thu',year:3,title:'IPCO / GTMCD',day:3,start:2,span:2,room:'N415',majors:['Econ','Stat'],kind:'shared',weeks:'1–16周',track:'dual'},
+  {id:'y3-ipco-seminar',year:3,title:'IPCO / GTMCD Seminar & Q&A',day:1,start:5,span:3,room:'N217',majors:'all',kind:'common',weeks:'1–16周',track:'dual'},
+  {id:'y3-ipco-seminar-2',year:3,title:'IPCO / GTMCD Seminar & Q&A',day:3,start:5,span:4,room:'N419 / N415',majors:'all',kind:'common',weeks:'1–16周',track:'dual'},
+  {id:'y3-single-gtmcd',year:3,title:'博弈论与多准则决策',english:'GTMCD · Game Theory and Multi Criteria Decision Making',day:1,start:1,span:3,room:'N418',majors:'all',kind:'common',weeks:'6–17周',track:'single',teacher:'戴天仕'},
+  {id:'y3-single-ipco',year:3,title:'整数规划与组合优化',english:'IPCO · Integer Programming and Combinatorial Optimisation',day:2,start:1,span:3,room:'N426',majors:'all',kind:'common',weeks:'6–17周',track:'single',teacher:'吴乐秦'},
   {id:'y3-real',year:3,title:'实变函数',english:'Theory of Real Variable Function',day:4,start:1,span:3,room:'N211',majors:['MAM'],kind:'major',weeks:'1–18周'},
   {id:'y3-topology',year:3,title:'一般拓扑学',english:'General Topology',day:0,start:9,span:3,room:'N411',majors:['MAM'],kind:'major',weeks:'1–18周'},
   {id:'y3-info',year:3,title:'信息论与编码',english:'Information Theory and Coding',day:2,start:5,span:3,room:'N509',majors:['ICS'],kind:'major',weeks:'1–18周'},
