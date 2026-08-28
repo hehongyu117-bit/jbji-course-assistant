@@ -44,6 +44,22 @@ function trackLabel(event:TimetableEvent){
   return event.track?degreeLabels[event.track]:'';
 }
 
+function uniqueValues(values:(string|undefined)[]){
+  return Array.from(new Set(values.filter((value):value is string=>Boolean(value))));
+}
+
+function eventDetails(event:TimetableEvent){
+  return [event.teacher&&`教师：${event.teacher}`,event.room&&`教室：${event.room}`,event.weeks&&`周次：${event.weeks}`].filter(Boolean).join(' · ');
+}
+
+function courseDetails(course:TimetableEvent,events:TimetableEvent[]){
+  const related=events.filter((event)=>event.title===course.title);
+  const teachers=uniqueValues(related.map((event)=>event.teacher));
+  const rooms=uniqueValues(related.map((event)=>event.room));
+  const weeks=uniqueValues(related.map((event)=>event.weeks));
+  return [teachers.length&&`教师：${teachers.join(' / ')}`,rooms.length&&`教室：${rooms.join(' / ')}`,weeks.length&&`周次：${weeks.join(' / ')}`].filter(Boolean).join(' · ');
+}
+
 export default function Home(){
   const [track,setTrack]=useState<DegreeTrack>('dual'); const [year,setYear]=useState(1); const [major,setMajor]=useState<Major>('MAM'); const [classNo,setClassNo]=useState(1);
   const selectedMajor=majors.find((item)=>item.id===major)!;
@@ -75,11 +91,11 @@ export default function Home(){
       <div className="tableScroll"><div className="timetable"><div className="corner">节次</div>{['周一','周二','周三','周四','周五'].map((day,index)=><div className="dayHead" style={{gridColumn:index+2}} key={day}>{day}<small>{['MON','TUE','WED','THU','FRI'][index]}</small></div>)}
         {times.map(([session,from,to],index)=><div className={`timeCell ${session==='5'?'break':''}`} style={{gridRow:index+2}} key={session}><strong>{session}</strong><span>{from}</span>{to&&<small>{to}</small>}</div>)}
         {times.map((_,row)=>[0,1,2,3,4].map((day)=><div className={`gridCell ${row===4?'break':''}`} style={{gridColumn:day+2,gridRow:row+2}} key={`${day}-${row}`}/>))}
-        {events.map((event)=><article className={`courseBlock tone-${event.kind}`} style={{gridColumn:event.day+2,gridRow:`${event.start+2} / span ${event.span}`,width:`calc((100% - 6px) / ${event.laneCount})`,marginLeft:`calc(${event.lane} * (100% / ${event.laneCount}) + 3px)`}} key={event.id} title={event.note}><span className="courseTag">{event.note||kindLabels[event.kind]}{trackLabel(event)&&` · ${trackLabel(event)}`}{audienceLabel(event)&&` · (${audienceLabel(event)})`}</span><strong>{event.title}</strong>{event.english&&<small>{event.english}</small>}<em>{event.room||'地点待通知'}{event.teacher?` · ${event.teacher}`:''}{event.weeks?` · ${event.weeks}`:''}</em></article>)}
+        {events.map((event)=><article className={`courseBlock tone-${event.kind}`} style={{gridColumn:event.day+2,gridRow:`${event.start+2} / span ${event.span}`,width:`calc((100% - 6px) / ${event.laneCount})`,marginLeft:`calc(${event.lane} * (100% / ${event.laneCount}) + 3px)`}} key={event.id} title={event.note}><span className="courseTag">{event.note||kindLabels[event.kind]}{trackLabel(event)&&` · ${trackLabel(event)}`}{audienceLabel(event)&&` · (${audienceLabel(event)})`}</span><strong>{event.title}</strong>{event.english&&<small className="courseEnglish">{event.english}</small>}{eventDetails(event)&&<small className="courseDetails">{eventDetails(event)}</small>}</article>)}
       </div></div>
       {events.length===0&&<div className="emptyState">当前组合暂无已公布上课时间的课程。</div>}
     </section>
-    <section className="courseSection"><div className="sectionHead compact"><div><p className="eyebrow">COURSE OVERVIEW</p><h2>本组合课程清单</h2></div><strong className="countBadge">{courses.length} 门</strong></div><div className="courseList">{courses.map((course)=><article className={`courseItem tone-${course.kind}`} key={course.title}><div><span>{kindLabels[course.kind]}{trackLabel(course)&&` · ${trackLabel(course)}`}{audienceLabel(course)&&` · (${audienceLabel(course)})`}</span><strong>{course.title}</strong>{course.english&&<small>{course.english}</small>}</div><div className="courseMeta">{course.weeks&&<b>{course.weeks}</b>}{course.teacher&&<em>{course.teacher}</em>}{course.note&&<em>{course.note}</em>}</div></article>)}</div></section>
+    <section className="courseSection"><div className="sectionHead compact"><div><p className="eyebrow">COURSE OVERVIEW</p><h2>本组合课程清单</h2></div><strong className="countBadge">{courses.length} 门</strong></div><div className="courseList">{courses.map((course)=><article className={`courseItem tone-${course.kind}`} key={course.title}><div><span>{kindLabels[course.kind]}{trackLabel(course)&&` · ${trackLabel(course)}`}{audienceLabel(course)&&` · (${audienceLabel(course)})`}</span><strong>{course.title}</strong>{course.english&&<small className="courseEnglish">{course.english}</small>}{courseDetails(course,filtered)&&<small className="courseDetails">{courseDetails(course,filtered)}</small>}</div></article>)}</div></section>
     <aside className="notice"><strong>使用说明</strong><p>双学位模式采用原课表中的 All Progs 数学模块；单学位模式会移除这些模块及其 Seminar，并换成单学位授课安排中的 RA、SAS、FM、MVA、GTMCD 与 IPCO。其他暨大学位课程仍按年级、专业和班级筛选。教室或周次有调整时，以学院最新通知为准。</p></aside>
     <footer><span>JBJI STUDENT TIMETABLE · 非官方学生工具</span><span>数据来源：双学位总课表及单学位伯大必修课程授课安排</span><a href="https://birmingham.jnu.edu.cn/" target="_blank" rel="noreferrer">学院官网 ↗</a></footer>
   </main>;
