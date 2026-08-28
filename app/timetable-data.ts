@@ -109,7 +109,7 @@ export const timetableEvents:TimetableEvent[]=[
 
 export const majors:{id:Major;label:string;name:string}[]=[
   {id:'MAM',label:'MAM',name:'数学与应用数学'}, {id:'ICS',label:'ICS',name:'信息与计算科学'},
-  {id:'Econ',label:'Econ',name:'经济学'}, {id:'Stat',label:'Stat',name:'统计学'},
+  {id:'Econ',label:'ECON',name:'经济学'}, {id:'Stat',label:'STAT',name:'经统'},
 ];
 
 export const times=[['1','08:30','09:15'],['2','09:25','10:10'],['3','10:30','11:15'],['4','11:25','12:10'],['5','午间',''],['6','14:00','14:45'],['7','14:55','15:40'],['8','15:50','16:35'],['9','16:45','17:30'],['10','18:30','19:15'],['11','19:25','20:10'],['12','20:20','21:05']];
