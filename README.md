@@ -1,8 +1,8 @@
-# JBJI 本科专属课表
+# JBJI Course Assistant
 
 面向 JBJI 本科生的课表筛选页面。可以按年级、专业和班级查看专属课程，数据来自 2026–27 学年第一学期课表。
 
-在线访问：<https://hehongyu117-bit.github.io/jbji-timetable/>
+在线访问：<https://hehongyu117-bit.github.io/jbji-course-assistant/>
 
 ## 本地运行
 
