@@ -39,6 +39,8 @@ function audienceLabel(event:TimetableEvent){
 }
 
 const degreeLabels:Record<DegreeTrack,string>={dual:'双学位',single:'单学位'};
+const weekdayNames=['周一','周二','周三','周四','周五'];
+const weekdayShort=['MON','TUE','WED','THU','FRI'];
 
 type SavedPreferences={track:DegreeTrack;year:number;major:Major;classNo:number};
 
@@ -112,9 +114,12 @@ export default function Home(){
   const courses=useMemo(()=>Array.from(new Map(filtered.map((event)=>[event.title,event])).values()).sort((a,b)=>a.kind.localeCompare(b.kind)||a.title.localeCompare(b.title,'zh-CN')),[filtered]);
   const groupLabel=classCount?`${selectedMajor.label}${classNo}`:selectedMajor.label;
   const scheduleRef=useRef<HTMLElement>(null);
+  const [selectedDay,setSelectedDay]=useState<number|'all'>('all');
   const [exporting,setExporting]=useState<'png'|'pdf'|null>(null);
   const [exportMessage,setExportMessage]=useState('');
-  const exportFileName=`JBJI-${degreeLabels[track]}-大${['一','二','三','四'][year-1]}-${selectedMajor.label}${classCount?`-${classNo}班`:''}-2026-27第一学期`;
+  const displayedDays=selectedDay==='all'?[0,1,2,3,4]:[selectedDay];
+  const displayedEvents=selectedDay==='all'?events:events.filter((event)=>event.day===selectedDay);
+  const exportFileName=`JBJI-${degreeLabels[track]}-大${['一','二','三','四'][year-1]}-${selectedMajor.label}${classCount?`-${classNo}班`:''}${selectedDay==='all'?'':`-${weekdayNames[selectedDay]}`}-2026-27第一学期`;
 
   async function renderScheduleCanvas(){
     if(!scheduleRef.current)throw new Error('找不到课表区域');
@@ -173,12 +178,13 @@ export default function Home(){
     </section>
     <section className="contextBar"><span>正在查看</span><strong>{degreeLabels[track]} · 大{['一','二','三','四'][year-1]} · {selectedMajor.name}{classCount?` · ${classNo} 班`:''}</strong><small>{track==='single'&&year<=3?'已替换为单学位伯大必修模块':year===1?'英语分组已按 E1–E12 对应到专业班级':year===2?'雅思分组已按 E1–E8 对应到专业班级':'本年级不区分英语班级组'}</small></section>
     <section className="scheduleSection" ref={scheduleRef}><div className="sectionHead"><div><p className="eyebrow">{degreeLabels[track].toUpperCase()} · YEAR {year} · {groupLabel}</p><h2>{selectedMajor.name} · {degreeLabels[track]}课表</h2></div><div className="sectionTools"><div className="legend"><span><i className="dot common"/>伯大课程</span><span><i className="dot shared"/>专业共享</span><span><i className="dot own"/>暨大课程</span><span><i className="dot optional"/>选修课程</span></div><div className="exportActions" data-export-exclude><button disabled={exporting!==null} onClick={()=>exportSchedule('png')}>{exporting==='png'?'生成中…':'导出图片'}</button><button className="primary" disabled={exporting!==null} onClick={()=>exportSchedule('pdf')}>{exporting==='pdf'?'生成中…':'导出 PDF'}</button><span className="exportStatus" role="status" aria-live="polite">{exportMessage}</span></div></div></div>
-      <div className="tableScroll"><div className="timetable"><div className="corner">节次</div>{['周一','周二','周三','周四','周五'].map((day,index)=><div className="dayHead" style={{gridColumn:index+2}} key={day}>{day}<small>{['MON','TUE','WED','THU','FRI'][index]}</small></div>)}
+      <div className="scheduleBody"><aside className="dayFilterPanel" aria-label="按上课日查看" data-export-exclude><span>上课日</span><div className="dayFilterButtons"><button className={selectedDay==='all'?'active':''} aria-pressed={selectedDay==='all'} onClick={()=>setSelectedDay('all')}>全部</button>{weekdayNames.map((day,index)=><button className={selectedDay===index?'active':''} aria-pressed={selectedDay===index} onClick={()=>setSelectedDay(index)} key={day}>{['一','二','三','四','五'][index]}</button>)}</div></aside>
+      <div className="scheduleContent"><div className="tableScroll"><div className="timetable" style={{gridTemplateColumns:displayedDays.length===1?'72px minmax(480px,1fr)':'72px repeat(5,minmax(165px,1fr))',minWidth:displayedDays.length===1?'620px':'960px'}}><div className="corner">节次</div>{displayedDays.map((day,index)=><div className="dayHead" style={{gridColumn:index+2}} key={day}>{weekdayNames[day]}<small>{weekdayShort[day]}</small></div>)}
         {times.map(([session,from,to],index)=><div className={`timeCell ${session==='5'?'break':''}`} style={{gridRow:index+2}} key={session}><strong>{session}</strong><span>{from}</span>{to&&<small>{to}</small>}</div>)}
-        {times.map((_,row)=>[0,1,2,3,4].map((day)=><div className={`gridCell ${row===4?'break':''}`} style={{gridColumn:day+2,gridRow:row+2}} key={`${day}-${row}`}/>))}
-        {events.map((event)=><article className={`courseBlock tone-${event.kind}`} style={{gridColumn:event.day+2,gridRow:`${event.start+2} / span ${event.span}`,width:`calc((100% - 6px) / ${event.laneCount})`,marginLeft:`calc(${event.lane} * (100% / ${event.laneCount}) + 3px)`}} key={event.id} title={event.note}><span className="courseTag">{event.note||kindLabels[event.kind]}{trackLabel(event)&&` · ${trackLabel(event)}`}{audienceLabel(event)&&` · (${audienceLabel(event)})`}</span><strong>{event.title}</strong>{event.english&&<small className="courseEnglish">{event.english}</small>}{eventDetails(event)&&<small className="courseDetails">{eventDetails(event)}</small>}</article>)}
+        {times.map((_,row)=>displayedDays.map((day,index)=><div className={`gridCell ${row===4?'break':''}`} style={{gridColumn:index+2,gridRow:row+2}} key={`${day}-${row}`}/>))}
+        {displayedEvents.map((event)=><article className={`courseBlock tone-${event.kind}`} style={{gridColumn:displayedDays.indexOf(event.day)+2,gridRow:`${event.start+2} / span ${event.span}`,width:`calc((100% - 6px) / ${event.laneCount})`,marginLeft:`calc(${event.lane} * (100% / ${event.laneCount}) + 3px)`}} key={event.id} title={event.note}><span className="courseTag">{event.note||kindLabels[event.kind]}{trackLabel(event)&&` · ${trackLabel(event)}`}{audienceLabel(event)&&` · (${audienceLabel(event)})`}</span><strong>{event.title}</strong>{event.english&&<small className="courseEnglish">{event.english}</small>}{eventDetails(event)&&<small className="courseDetails">{eventDetails(event)}</small>}</article>)}
       </div></div>
-      {events.length===0&&<div className="emptyState">当前组合暂无已公布上课时间的课程。</div>}
+      {displayedEvents.length===0&&<div className="emptyState">{selectedDay==='all'?'当前组合暂无已公布上课时间的课程。':`${weekdayNames[selectedDay]}暂无已公布上课时间的课程。`}</div>}</div></div>
       <p className="exportFootnote" data-export-only>JBJI STUDENT TIMETABLE · 2026–27 学年第一学期 · 数据仅供参考，最终安排以学院最新通知为准。</p>
     </section>
     <section className="courseSection"><div className="sectionHead compact"><div><p className="eyebrow">COURSE OVERVIEW</p><h2>本组合课程清单</h2></div><strong className="countBadge">{courses.length} 门</strong></div><div className="courseList">{courses.map((course)=><article className={`courseItem tone-${course.kind}`} key={course.title}><div><span>{kindLabels[course.kind]}{trackLabel(course)&&` · ${trackLabel(course)}`}{audienceLabel(course)&&` · (${audienceLabel(course)})`}</span><strong>{course.title}</strong>{course.english&&<small className="courseEnglish">{course.english}</small>}{courseDetails(course,filtered)&&<small className="courseDetails">{courseDetails(course,filtered)}</small>}</div></article>)}</div></section>
