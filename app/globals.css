@@ -54,8 +54,17 @@ h1 { margin:0; max-width:800px; font-family:Georgia,"Songti SC",serif; font-size
 .sectionHead { display:flex; justify-content:space-between; align-items:end; gap:20px; margin-bottom:16px; }
 .sectionHead.compact { align-items:center; }
 .sectionHead h2 { margin:0; font-family:Georgia,"Songti SC",serif; font-size:29px; font-weight:600; }
+.sectionTools { display:flex; flex-direction:column; align-items:flex-end; gap:11px; }
 .legend { display:flex; gap:14px; color:var(--muted); font-size:10px; flex-wrap:wrap; }
 .legend span { display:flex; align-items:center; gap:5px; }
+.exportActions { display:flex; align-items:center; justify-content:flex-end; gap:7px; min-height:31px; }
+.exportActions button { min-height:31px; padding:6px 11px; border:1px solid #d8d8d8; border-radius:3px; color:#444; background:#f7f7f4; font-size:9px; font-weight:800; cursor:pointer; transition:.18s ease; }
+.exportActions button:hover:not(:disabled) { color:var(--orange); border-color:var(--orange); transform:translateY(-1px); }
+.exportActions button:focus-visible { outline:3px solid #ffd2a8; outline-offset:2px; }
+.exportActions button.primary { color:#fff; border-color:var(--orange); background:var(--orange); }
+.exportActions button.primary:hover:not(:disabled) { color:#fff; background:#cc6510; }
+.exportActions button:disabled { cursor:wait; opacity:.58; }
+.exportStatus { min-width:76px; color:var(--muted); font-size:8px; text-align:left; }
 .dot { width:8px; height:8px; border-radius:50%; }
 .dot.common { background:var(--orange); }
 .dot.shared { background:var(--red); }
@@ -87,6 +96,7 @@ h1 { margin:0; max-width:800px; font-family:Georgia,"Songti SC",serif; font-size
 .tone-optional { background:#eeeeee; border-color:#666; }
 .tone-general { background:#edf4ea; border-color:#66855a; }
 .emptyState { padding:36px; text-align:center; color:var(--muted); font-size:12px; }
+.exportFootnote { display:none; margin:14px 0 0; padding-top:10px; border-top:1px solid var(--line); color:var(--muted); font-size:9px; text-align:right; letter-spacing:.03em; }
 .countBadge { padding:7px 11px; border-radius:2px; background:var(--orange); color:#fff; font-family:Georgia,serif; font-size:11px; }
 .courseList { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
 .courseItem { border:1px solid var(--line); border-left-width:4px; border-radius:3px; padding:13px 14px; }
@@ -118,7 +128,11 @@ footer a:hover { text-decoration:underline; }
   .heroBackdrop::after { background:linear-gradient(100deg,#fff5ef 0%,rgba(255,245,239,.97) 76%,rgba(255,245,239,.35) 100%); }
   .heroStat { display:none; }
   .sectionHead { display:block; }
+  .sectionTools { align-items:flex-start; margin-top:12px; }
   .legend { margin-top:12px; }
+  .sectionTools .legend { margin-top:0; }
+  .exportActions { justify-content:flex-start; flex-wrap:wrap; }
+  .exportStatus { flex-basis:100%; min-height:12px; }
   .scheduleSection,.courseSection { padding:14px; }
   .hero,.filterPanel,.contextBar,.scheduleSection,.courseSection,.notice,footer { width:min(100% - 24px,1240px); }
   h1 { font-size:38px; }

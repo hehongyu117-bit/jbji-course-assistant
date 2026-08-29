@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { majors, timetableEvents, times, type DegreeTrack, type Major, type TimetableEvent } from './timetable-data';
 
 type LaidEvent=TimetableEvent&{lane:number;laneCount:number};
@@ -40,6 +40,27 @@ function audienceLabel(event:TimetableEvent){
 
 const degreeLabels:Record<DegreeTrack,string>={dual:'双学位',single:'单学位'};
 
+type SavedPreferences={track:DegreeTrack;year:number;major:Major;classNo:number};
+
+const preferencesKey='jbji-course-assistant:preferences:v1';
+const defaultPreferences:SavedPreferences={track:'dual',year:1,major:'MAM',classNo:1};
+
+function loadPreferences():SavedPreferences{
+  if(typeof window==='undefined')return defaultPreferences;
+  try{
+    const saved=JSON.parse(window.localStorage.getItem(preferencesKey)||'null') as Partial<SavedPreferences>|null;
+    if(!saved||typeof saved!=='object')return defaultPreferences;
+    return {
+      track:saved.track==='dual'||saved.track==='single'?saved.track:defaultPreferences.track,
+      year:typeof saved.year==='number'&&[1,2,3,4].includes(saved.year)?saved.year:defaultPreferences.year,
+      major:typeof saved.major==='string'&&majors.some((item)=>item.id===saved.major)?saved.major as Major:defaultPreferences.major,
+      classNo:typeof saved.classNo==='number'&&[1,2,3].includes(saved.classNo)?saved.classNo:defaultPreferences.classNo,
+    };
+  }catch{
+    return defaultPreferences;
+  }
+}
+
 function trackLabel(event:TimetableEvent){
   return event.track?degreeLabels[event.track]:'';
 }
@@ -60,11 +81,25 @@ function courseDetails(course:TimetableEvent,events:TimetableEvent[]){
   return [teachers.length&&`教师：${teachers.join(' / ')}`,rooms.length&&`教室：${rooms.join(' / ')}`,weeks.length&&`周次：${weeks.join(' / ')}`].filter(Boolean).join(' · ');
 }
 
+function downloadFile(url:string,fileName:string){
+  const link=document.createElement('a');
+  link.href=url; link.download=fileName; link.style.display='none';
+  document.body.appendChild(link); link.click(); link.remove();
+}
+
 export default function Home(){
-  const [track,setTrack]=useState<DegreeTrack>('dual'); const [year,setYear]=useState(1); const [major,setMajor]=useState<Major>('MAM'); const [classNo,setClassNo]=useState(1);
+  const [savedPreferences]=useState(loadPreferences);
+  const [track,setTrack]=useState<DegreeTrack>(savedPreferences.track); const [year,setYear]=useState(savedPreferences.year); const [major,setMajor]=useState<Major>(savedPreferences.major); const [classNo,setClassNo]=useState(savedPreferences.classNo);
   const selectedMajor=majors.find((item)=>item.id===major)!;
   const classCount=year===1?3:year===2?2:0;
   useEffect(()=>{if(classCount&&classNo>classCount)setClassNo(1)},[classCount,classNo]);
+  useEffect(()=>{
+    try{
+      window.localStorage.setItem(preferencesKey,JSON.stringify({track,year,major,classNo} satisfies SavedPreferences));
+    }catch{
+      // Storage may be unavailable in private browsing or under restrictive browser settings.
+    }
+  },[track,year,major,classNo]);
   const filtered=useMemo(()=>timetableEvents.filter((event)=>{
     if(event.year!==year)return false;
     if(event.track&&event.track!==track)return false;
@@ -76,6 +111,56 @@ export default function Home(){
   const events=useMemo(()=>arrange(scheduled),[scheduled]);
   const courses=useMemo(()=>Array.from(new Map(filtered.map((event)=>[event.title,event])).values()).sort((a,b)=>a.kind.localeCompare(b.kind)||a.title.localeCompare(b.title,'zh-CN')),[filtered]);
   const groupLabel=classCount?`${selectedMajor.label}${classNo}`:selectedMajor.label;
+  const scheduleRef=useRef<HTMLElement>(null);
+  const [exporting,setExporting]=useState<'png'|'pdf'|null>(null);
+  const [exportMessage,setExportMessage]=useState('');
+  const exportFileName=`JBJI-${degreeLabels[track]}-大${['一','二','三','四'][year-1]}-${selectedMajor.label}${classCount?`-${classNo}班`:''}-2026-27第一学期`;
+
+  async function renderScheduleCanvas(){
+    if(!scheduleRef.current)throw new Error('找不到课表区域');
+    await document.fonts?.ready;
+    const clone=scheduleRef.current.cloneNode(true) as HTMLElement;
+    clone.querySelectorAll<HTMLElement>('[data-export-exclude]').forEach((element)=>element.remove());
+    clone.querySelectorAll<HTMLElement>('[data-export-only]').forEach((element)=>{element.style.display='block'});
+    Object.assign(clone.style,{position:'fixed',left:'-10000px',top:'0',width:'1240px',maxWidth:'none',margin:'0',boxShadow:'none',zIndex:'-1'});
+    const tableScroll=clone.querySelector<HTMLElement>('.tableScroll');
+    if(tableScroll)tableScroll.style.overflow='visible';
+    const timetable=clone.querySelector<HTMLElement>('.timetable');
+    if(timetable)timetable.style.gridTemplateRows='50px repeat(12,66px)';
+    document.body.appendChild(clone);
+    try{
+      const {default:html2canvas}=await import('html2canvas');
+      return await html2canvas(clone,{backgroundColor:'#ffffff',scale:2,useCORS:true,logging:false});
+    }finally{
+      clone.remove();
+    }
+  }
+
+  async function exportSchedule(format:'png'|'pdf'){
+    setExporting(format); setExportMessage(format==='png'?'正在生成图片…':'正在生成 PDF…');
+    try{
+      const canvas=await renderScheduleCanvas();
+      if(format==='png'){
+        const blob=await new Promise<Blob>((resolve,reject)=>canvas.toBlob((value)=>value?resolve(value):reject(new Error('图片生成失败')),'image/png'));
+        const url=URL.createObjectURL(blob);
+        downloadFile(url,`${exportFileName}.png`); URL.revokeObjectURL(url);
+      }else{
+        const {jsPDF}=await import('jspdf');
+        const landscape=canvas.width>=canvas.height;
+        const pdf=new jsPDF({orientation:landscape?'landscape':'portrait',unit:'mm',format:'a4',compress:true});
+        const pageWidth=pdf.internal.pageSize.getWidth(); const pageHeight=pdf.internal.pageSize.getHeight(); const margin=8;
+        const ratio=Math.min((pageWidth-margin*2)/canvas.width,(pageHeight-margin*2)/canvas.height);
+        const width=canvas.width*ratio; const height=canvas.height*ratio;
+        pdf.addImage(canvas.toDataURL('image/png'),'PNG',(pageWidth-width)/2,(pageHeight-height)/2,width,height,undefined,'FAST');
+        pdf.save(`${exportFileName}.pdf`);
+      }
+      setExportMessage(format==='png'?'图片已导出':'PDF 已导出');
+    }catch(error){
+      console.error(error); setExportMessage('导出失败，请稍后重试');
+    }finally{
+      setExporting(null);
+    }
+  }
 
   return <main>
     <header className="topbar"><a className="brand" href="#top"><img className="brandLogo" src="./jbji-logo.png" alt="暨南大学伯明翰大学联合学院院徽"/></a><span className="sourceBadge"><b>本科课表</b><span>2026–27 学年 · 第一学期</span></span></header>
@@ -87,13 +172,14 @@ export default function Home(){
       {classCount>0&&<div className="filterGroup classGroup"><span>班级</span><div className="segmented">{Array.from({length:classCount},(_,i)=>i+1).map((item)=><button key={item} className={classNo===item?'active':''} onClick={()=>setClassNo(item)}>{item} 班</button>)}</div></div>}
     </section>
     <section className="contextBar"><span>正在查看</span><strong>{degreeLabels[track]} · 大{['一','二','三','四'][year-1]} · {selectedMajor.name}{classCount?` · ${classNo} 班`:''}</strong><small>{track==='single'&&year<=3?'已替换为单学位伯大必修模块':year===1?'英语分组已按 E1–E12 对应到专业班级':year===2?'雅思分组已按 E1–E8 对应到专业班级':'本年级不区分英语班级组'}</small></section>
-    <section className="scheduleSection"><div className="sectionHead"><div><p className="eyebrow">{degreeLabels[track].toUpperCase()} · YEAR {year} · {groupLabel}</p><h2>{selectedMajor.name} · {degreeLabels[track]}课表</h2></div><div className="legend"><span><i className="dot common"/>伯大课程</span><span><i className="dot shared"/>专业共享</span><span><i className="dot own"/>暨大课程</span><span><i className="dot optional"/>选修课程</span></div></div>
+    <section className="scheduleSection" ref={scheduleRef}><div className="sectionHead"><div><p className="eyebrow">{degreeLabels[track].toUpperCase()} · YEAR {year} · {groupLabel}</p><h2>{selectedMajor.name} · {degreeLabels[track]}课表</h2></div><div className="sectionTools"><div className="legend"><span><i className="dot common"/>伯大课程</span><span><i className="dot shared"/>专业共享</span><span><i className="dot own"/>暨大课程</span><span><i className="dot optional"/>选修课程</span></div><div className="exportActions" data-export-exclude><button disabled={exporting!==null} onClick={()=>exportSchedule('png')}>{exporting==='png'?'生成中…':'导出图片'}</button><button className="primary" disabled={exporting!==null} onClick={()=>exportSchedule('pdf')}>{exporting==='pdf'?'生成中…':'导出 PDF'}</button><span className="exportStatus" role="status" aria-live="polite">{exportMessage}</span></div></div></div>
       <div className="tableScroll"><div className="timetable"><div className="corner">节次</div>{['周一','周二','周三','周四','周五'].map((day,index)=><div className="dayHead" style={{gridColumn:index+2}} key={day}>{day}<small>{['MON','TUE','WED','THU','FRI'][index]}</small></div>)}
         {times.map(([session,from,to],index)=><div className={`timeCell ${session==='5'?'break':''}`} style={{gridRow:index+2}} key={session}><strong>{session}</strong><span>{from}</span>{to&&<small>{to}</small>}</div>)}
         {times.map((_,row)=>[0,1,2,3,4].map((day)=><div className={`gridCell ${row===4?'break':''}`} style={{gridColumn:day+2,gridRow:row+2}} key={`${day}-${row}`}/>))}
         {events.map((event)=><article className={`courseBlock tone-${event.kind}`} style={{gridColumn:event.day+2,gridRow:`${event.start+2} / span ${event.span}`,width:`calc((100% - 6px) / ${event.laneCount})`,marginLeft:`calc(${event.lane} * (100% / ${event.laneCount}) + 3px)`}} key={event.id} title={event.note}><span className="courseTag">{event.note||kindLabels[event.kind]}{trackLabel(event)&&` · ${trackLabel(event)}`}{audienceLabel(event)&&` · (${audienceLabel(event)})`}</span><strong>{event.title}</strong>{event.english&&<small className="courseEnglish">{event.english}</small>}{eventDetails(event)&&<small className="courseDetails">{eventDetails(event)}</small>}</article>)}
       </div></div>
       {events.length===0&&<div className="emptyState">当前组合暂无已公布上课时间的课程。</div>}
+      <p className="exportFootnote" data-export-only>JBJI STUDENT TIMETABLE · 2026–27 学年第一学期 · 数据仅供参考，最终安排以学院最新通知为准。</p>
     </section>
     <section className="courseSection"><div className="sectionHead compact"><div><p className="eyebrow">COURSE OVERVIEW</p><h2>本组合课程清单</h2></div><strong className="countBadge">{courses.length} 门</strong></div><div className="courseList">{courses.map((course)=><article className={`courseItem tone-${course.kind}`} key={course.title}><div><span>{kindLabels[course.kind]}{trackLabel(course)&&` · ${trackLabel(course)}`}{audienceLabel(course)&&` · (${audienceLabel(course)})`}</span><strong>{course.title}</strong>{course.english&&<small className="courseEnglish">{course.english}</small>}{courseDetails(course,filtered)&&<small className="courseDetails">{courseDetails(course,filtered)}</small>}</div></article>)}</div></section>
     <aside className="notice"><strong>使用说明</strong><p>双学位模式采用原课表中的 All Progs 数学模块；单学位模式会移除这些模块及其 Seminar，并换成单学位授课安排中的 RA、SAS、FM、MVA、GTMCD 与 IPCO。其他暨大学位课程仍按年级、专业和班级筛选。教室或周次有调整时，以学院最新通知为准。</p></aside>
