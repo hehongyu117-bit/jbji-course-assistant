@@ -92,6 +92,13 @@ function courseDetails(course:TimetableEvent,events:TimetableEvent[]){
   return [teachers.length&&`教师：${teachers.join(' / ')}`,rooms.length&&`教室：${rooms.join(' / ')}`,weeks.length&&`周次：${weeks.join(' / ')}`].filter(Boolean).join(' · ');
 }
 
+function courseScheduleDetails(course:TimetableEvent,events:TimetableEvent[]){
+  return uniqueValues(events.filter((event)=>event.title===course.title).map((event)=>{
+    const first=event.start+1; const last=event.start+event.span;
+    return `${weekdayNames[event.day]} · 第${first}${last>first?`–${last}`:''}节`;
+  })).join(' / ');
+}
+
 function downloadFile(url:string,fileName:string){
   const link=document.createElement('a');
   link.href=url; link.download=fileName; link.style.display='none';
@@ -119,7 +126,6 @@ export default function Home(){
     return true;
   }),[track,year,major,classNo,classCount]);
   const scheduled=useMemo(()=>filtered.filter((event)=>!event.listedOnly),[filtered]);
-  const events=useMemo(()=>arrange(scheduled),[scheduled]);
   const courses=useMemo(()=>Array.from(new Map(filtered.map((event)=>[event.title,event])).values()).sort((a,b)=>a.kind.localeCompare(b.kind)||a.title.localeCompare(b.title,'zh-CN')),[filtered]);
   const groupLabel=classCount?`${selectedMajor.label}${classNo}`:selectedMajor.label;
   const scheduleRef=useRef<HTMLElement>(null);
@@ -130,12 +136,14 @@ export default function Home(){
   const [exportMessage,setExportMessage]=useState('');
   const displayedDays=selectedDay==='all'?[0,1,2,3,4]:[selectedDay];
   const normalizedQuery=courseQuery.trim().toLocaleLowerCase('zh-CN');
-  const displayedEvents=events.filter((event)=>{
+  const matchingEvents=scheduled.filter((event)=>{
     if(selectedDay!=='all'&&event.day!==selectedDay)return false;
     if(selectedCategory!=='all'&&courseCategory(event)!==selectedCategory)return false;
     if(normalizedQuery&&!`${event.title} ${event.english||''}`.toLocaleLowerCase('zh-CN').includes(normalizedQuery))return false;
     return true;
   });
+  const displayedEvents=arrange(matchingEvents);
+  const sidebarCourses=Array.from(new Map(matchingEvents.map((event)=>[event.title,event])).values()).sort((a,b)=>a.title.localeCompare(b.title,'zh-CN'));
   const activeFilterLabel=[selectedDay==='all'?'':weekdayNames[selectedDay],selectedCategory==='all'?'':categoryLabels[selectedCategory],courseQuery.trim()].filter(Boolean).join('-');
   const exportFileName=`JBJI-${degreeLabels[track]}-大${['一','二','三','四'][year-1]}-${selectedMajor.label}${classCount?`-${classNo}班`:''}${activeFilterLabel?`-${activeFilterLabel}`:''}-2026-27第一学期`;
 
@@ -146,6 +154,8 @@ export default function Home(){
     clone.querySelectorAll<HTMLElement>('[data-export-exclude]').forEach((element)=>element.remove());
     clone.querySelectorAll<HTMLElement>('[data-export-only]').forEach((element)=>{element.style.display='block'});
     Object.assign(clone.style,{position:'fixed',left:'-10000px',top:'0',width:'1240px',maxWidth:'none',margin:'0',boxShadow:'none',zIndex:'-1'});
+    const scheduleBody=clone.querySelector<HTMLElement>('.scheduleBody');
+    if(scheduleBody)scheduleBody.style.gridTemplateColumns='1fr';
     const tableScroll=clone.querySelector<HTMLElement>('.tableScroll');
     if(tableScroll)tableScroll.style.overflow='visible';
     const timetable=clone.querySelector<HTMLElement>('.timetable');
@@ -195,18 +205,24 @@ export default function Home(){
       {classCount>0&&<div className="filterGroup classGroup"><span>班级</span><div className="segmented">{Array.from({length:classCount},(_,i)=>i+1).map((item)=><button key={item} className={classNo===item?'active':''} onClick={()=>setClassNo(item)}>{item} 班</button>)}</div></div>}
     </section>
     <section className="contextBar"><span>正在查看</span><strong>{degreeLabels[track]} · 大{['一','二','三','四'][year-1]} · {selectedMajor.name}{classCount?` · ${classNo} 班`:''}</strong><small>{track==='single'&&year<=3?'已替换为单学位伯大必修模块':year===1?'英语分组已按 E1–E12 对应到专业班级':year===2?'雅思分组已按 E1–E8 对应到专业班级':'本年级不区分英语班级组'}</small></section>
-    <section className="scheduleSection" ref={scheduleRef}><div className="sectionHead"><div><p className="eyebrow">{degreeLabels[track].toUpperCase()} · YEAR {year} · {groupLabel}</p><h2>{selectedMajor.name} · {degreeLabels[track]}课表</h2></div><div className="sectionTools"><div className="legend"><span><i className="dot uob"/>伯大</span><span><i className="dot jnu"/>暨大</span><span><i className="dot english"/>英语</span><span><i className="dot general"/>通识课</span></div><div className="exportActions" data-export-exclude><button disabled={exporting!==null} onClick={()=>exportSchedule('png')}>{exporting==='png'?'生成中…':'导出图片'}</button><button className="primary" disabled={exporting!==null} onClick={()=>exportSchedule('pdf')}>{exporting==='pdf'?'生成中…':'导出 PDF'}</button><span className="exportStatus" role="status" aria-live="polite">{exportMessage}</span></div></div></div>
-      <div className="scheduleBody"><aside className="dayFilterPanel" aria-label="课表内容筛选" data-export-exclude>
-        <div className="sideFilterGroup"><span>上课日</span><div className="dayFilterButtons"><button className={selectedDay==='all'?'active':''} aria-pressed={selectedDay==='all'} onClick={()=>setSelectedDay('all')}>全部</button>{weekdayNames.map((day,index)=><button className={selectedDay===index?'active':''} aria-pressed={selectedDay===index} onClick={()=>setSelectedDay(index)} key={day}>{['一','二','三','四','五'][index]}</button>)}</div></div>
-        <div className="sideFilterGroup"><span>课程类别</span><div className="categoryFilterButtons"><button className={selectedCategory==='all'?'active':''} aria-pressed={selectedCategory==='all'} onClick={()=>setSelectedCategory('all')}>全部</button>{(Object.keys(categoryLabels) as CourseCategory[]).map((category)=><button className={selectedCategory===category?'active':''} aria-pressed={selectedCategory===category} onClick={()=>setSelectedCategory(category)} key={category}>{categoryLabels[category]}</button>)}</div></div>
-        <div className="sideFilterGroup searchFilter"><label htmlFor="course-search">搜索课程</label><input id="course-search" type="search" value={courseQuery} onChange={(event)=>setCourseQuery(event.target.value)} placeholder="输入课程名称" autoComplete="off"/><small>{displayedEvents.length} 个课表时段</small></div>
+    <section className="scheduleSection" ref={scheduleRef}><div className="scheduleBody">
+      <aside className="courseSidebar" aria-label="浏览和筛选课程" data-export-exclude>
+        <div className="sidebarHead"><strong>浏览课程</strong><span>{sidebarCourses.length} 门</span></div>
+        <div className="sidebarPanel">
+          <label className="courseSearch" htmlFor="course-search"><span>搜索课程</span><input id="course-search" type="search" value={courseQuery} onChange={(event)=>setCourseQuery(event.target.value)} placeholder="搜索中文名或英文名" autoComplete="off"/></label>
+          <div className="sidebarFilter"><span>课程类别</span><div className="filterPills"><button className={selectedCategory==='all'?'active':''} aria-pressed={selectedCategory==='all'} onClick={()=>setSelectedCategory('all')}>全部</button>{(Object.keys(categoryLabels) as CourseCategory[]).map((category)=><button className={selectedCategory===category?'active':''} aria-pressed={selectedCategory===category} onClick={()=>setSelectedCategory(category)} key={category}>{categoryLabels[category]}</button>)}</div></div>
+          <div className="sidebarFilter"><span>上课日</span><div className="filterPills"><button className={selectedDay==='all'?'active':''} aria-pressed={selectedDay==='all'} onClick={()=>setSelectedDay('all')}>全部</button>{weekdayNames.map((day,index)=><button className={selectedDay===index?'active':''} aria-pressed={selectedDay===index} onClick={()=>setSelectedDay(index)} key={day}>{['一','二','三','四','五'][index]}</button>)}</div></div>
+          {(selectedDay!=='all'||selectedCategory!=='all'||courseQuery)&&<button className="clearFilters" onClick={()=>{setSelectedDay('all');setSelectedCategory('all');setCourseQuery('')}}>清除全部筛选</button>}
+          <div className="sidebarCourseList" aria-live="polite">{sidebarCourses.map((course)=><button className={`sidebarCourseCard category-${courseCategory(course)} ${normalizedQuery===course.title.toLocaleLowerCase('zh-CN')?'selected':''}`} onClick={()=>setCourseQuery(course.title)} key={course.title}><span>{categoryLabels[courseCategory(course)]}{audienceLabel(course)&&` · ${audienceLabel(course)}`}</span><strong>{course.title}</strong>{course.english&&<small>{course.english}</small>}<em>{courseScheduleDetails(course,matchingEvents)}</em>{course.room&&<i>教室：{course.room}</i>}</button>)}{sidebarCourses.length===0&&<p className="sidebarEmpty">没有符合条件的课程</p>}</div>
+        </div>
       </aside>
+      <div className="timetablePanel"><div className="sectionHead"><div><p className="eyebrow">{degreeLabels[track].toUpperCase()} · YEAR {year} · {groupLabel}</p><h2>{selectedMajor.name} · {degreeLabels[track]}课表</h2></div><div className="sectionTools"><div className="legend"><span><i className="dot uob"/>伯大</span><span><i className="dot jnu"/>暨大</span><span><i className="dot english"/>英语</span><span><i className="dot general"/>通识课</span></div><div className="exportActions" data-export-exclude><button disabled={exporting!==null} onClick={()=>exportSchedule('png')}>{exporting==='png'?'生成中…':'导出图片'}</button><button className="primary" disabled={exporting!==null} onClick={()=>exportSchedule('pdf')}>{exporting==='pdf'?'生成中…':'导出 PDF'}</button><span className="exportStatus" role="status" aria-live="polite">{exportMessage}</span></div></div></div>
       <div className="scheduleContent"><div className="tableScroll"><div className="timetable" style={{gridTemplateColumns:displayedDays.length===1?'72px minmax(480px,1fr)':'72px repeat(5,minmax(165px,1fr))',minWidth:displayedDays.length===1?'620px':'960px'}}><div className="corner">节次</div>{displayedDays.map((day,index)=><div className="dayHead" style={{gridColumn:index+2}} key={day}>{weekdayNames[day]}<small>{weekdayShort[day]}</small></div>)}
         {times.map(([session,from,to],index)=><div className={`timeCell ${session==='5'?'break':''}`} style={{gridRow:index+2}} key={session}><strong>{session}</strong><span>{from}</span>{to&&<small>{to}</small>}</div>)}
         {times.map((_,row)=>displayedDays.map((day,index)=><div className={`gridCell ${row===4?'break':''}`} style={{gridColumn:index+2,gridRow:row+2}} key={`${day}-${row}`}/>))}
         {displayedEvents.map((event)=><article className={`courseBlock category-${courseCategory(event)}`} style={{gridColumn:displayedDays.indexOf(event.day)+2,gridRow:`${event.start+2} / span ${event.span}`,width:`calc((100% - 6px) / ${event.laneCount})`,marginLeft:`calc(${event.lane} * (100% / ${event.laneCount}) + 3px)`}} key={event.id} title={event.note}><span className="courseTag">{categoryLabels[courseCategory(event)]}{event.note&&` · ${event.note}`}{trackLabel(event)&&` · ${trackLabel(event)}`}{audienceLabel(event)&&` · (${audienceLabel(event)})`}</span><strong>{event.title}</strong>{event.english&&<small className="courseEnglish">{event.english}</small>}{eventDetails(event)&&<small className="courseDetails">{eventDetails(event)}</small>}</article>)}
       </div></div>
-      {displayedEvents.length===0&&<div className="emptyState">没有找到符合当前筛选条件的课程，请尝试切换类别或清除搜索内容。</div>}</div></div>
+      {displayedEvents.length===0&&<div className="emptyState">没有找到符合当前筛选条件的课程，请尝试切换类别或清除搜索内容。</div>}</div></div></div>
       <p className="exportFootnote" data-export-only>JBJI STUDENT TIMETABLE · 2026–27 学年第一学期 · 数据仅供参考，最终安排以学院最新通知为准。</p>
     </section>
     <section className="courseSection"><div className="sectionHead compact"><div><p className="eyebrow">COURSE OVERVIEW</p><h2>本组合课程清单</h2></div><strong className="countBadge">{courses.length} 门</strong></div><div className="courseList">{courses.map((course)=><article className={`courseItem category-${courseCategory(course)}`} key={course.title}><div><span>{categoryLabels[courseCategory(course)]}{trackLabel(course)&&` · ${trackLabel(course)}`}{audienceLabel(course)&&` · (${audienceLabel(course)})`}</span><strong>{course.title}</strong>{course.english&&<small className="courseEnglish">{course.english}</small>}{courseDetails(course,filtered)&&<small className="courseDetails">{courseDetails(course,filtered)}</small>}</div></article>)}</div></section>
