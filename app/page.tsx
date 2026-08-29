@@ -196,7 +196,7 @@ export default function Home(){
   }
 
   return <main>
-    <header className="topbar"><a className="brand" href="#top" aria-label="JBJI课表助手首页"><span className="brandMark"><img className="brandLogo" src="./jbji-logo.png" alt="暨南大学与伯明翰大学院徽"/></span><span className="brandCopy"><strong>JBJI课表助手</strong><small>2026/2027 FALL SEMESTER</small></span></a></header>
+    <header className="topbar"><a className="brand" href="#top" aria-label="JBJI课表助手首页"><span className="brandMark"><img className="brandLogo" src="./jbji-logo.png" alt="暨南大学与伯明翰大学院徽"/></span><span className="brandCopy"><strong>JBJI课表助手</strong><small>2026/2027 FALL SEMESTER</small></span></a><div className="topbarMascot" aria-label="JBJI 奶龙吉祥物"><img src="./jbji-nailong-guardian.png" alt="印有暨南大学伯明翰大学联合学院标识的奶龙"/></div></header>
     <section className="hero" id="top"><div className="heroBackdrop" aria-hidden="true"><img src="./jbji-banner.jpg" alt=""/></div><div className="heroCopy"><p className="eyebrow">JBJI PERSONAL TIMETABLE</p><h1>一张课表，<br/>看清你的暨伯学期。</h1><p className="lead">选择学位类型、年级、专业与班级，只保留与你相关的课程。双学位与单学位的伯大数学模块会自动切换。</p><div className="heroRule"><span>数学交叉</span><span>双校培养</span><span>四个本科专业</span></div></div><div className="heroStat"><span>当前组合</span><strong>{courses.length}</strong><small>COURSES</small></div></section>
     <section className="filterPanel" aria-label="课表筛选">
       <div className="filterGroup trackGroup"><span>学位类型</span><div className="segmented">{(['dual','single'] as DegreeTrack[]).map((item)=><button key={item} className={track===item?'active':''} onClick={()=>setTrack(item)}><b>{degreeLabels[item]}</b><small>{item==='dual'?'JNU + UoB':'JNU Degree'}</small></button>)}</div></div>
