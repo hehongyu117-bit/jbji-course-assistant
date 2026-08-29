@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { majors, timetableEvents, times, type DegreeTrack, type Major, type TimetableEvent } from './timetable-data';
 
 type LaidEvent=TimetableEvent&{lane:number;laneCount:number};
+type CourseCategory='uob'|'jnu'|'english'|'general';
 
 function arrange(events:TimetableEvent[]):LaidEvent[]{
   const result:LaidEvent[]=[];
@@ -28,7 +29,15 @@ function arrange(events:TimetableEvent[]):LaidEvent[]{
   return result;
 }
 
-const kindLabels={common:'伯大课程',shared:'专业共享',major:'暨大课程',optional:'选修课程',general:'通识课'};
+const categoryLabels:Record<CourseCategory,string>={uob:'伯大',jnu:'暨大',english:'英语',general:'通识课'};
+
+function courseCategory(event:TimetableEvent):CourseCategory{
+  const searchable=`${event.title} ${event.english||''}`.toLowerCase();
+  if(/英语|雅思|英美历史|english|ielts|history and culture of uk/.test(searchable))return 'english';
+  if(/思想道德|中国近代史|马克思主义|体育|军事理论|心理健康|艺术体验/.test(event.title))return 'general';
+  if(event.track)return 'uob';
+  return 'jnu';
+}
 
 function audienceLabel(event:TimetableEvent){
   if(event.majors==='all')return '';
@@ -115,11 +124,20 @@ export default function Home(){
   const groupLabel=classCount?`${selectedMajor.label}${classNo}`:selectedMajor.label;
   const scheduleRef=useRef<HTMLElement>(null);
   const [selectedDay,setSelectedDay]=useState<number|'all'>('all');
+  const [selectedCategory,setSelectedCategory]=useState<CourseCategory|'all'>('all');
+  const [courseQuery,setCourseQuery]=useState('');
   const [exporting,setExporting]=useState<'png'|'pdf'|null>(null);
   const [exportMessage,setExportMessage]=useState('');
   const displayedDays=selectedDay==='all'?[0,1,2,3,4]:[selectedDay];
-  const displayedEvents=selectedDay==='all'?events:events.filter((event)=>event.day===selectedDay);
-  const exportFileName=`JBJI-${degreeLabels[track]}-大${['一','二','三','四'][year-1]}-${selectedMajor.label}${classCount?`-${classNo}班`:''}${selectedDay==='all'?'':`-${weekdayNames[selectedDay]}`}-2026-27第一学期`;
+  const normalizedQuery=courseQuery.trim().toLocaleLowerCase('zh-CN');
+  const displayedEvents=events.filter((event)=>{
+    if(selectedDay!=='all'&&event.day!==selectedDay)return false;
+    if(selectedCategory!=='all'&&courseCategory(event)!==selectedCategory)return false;
+    if(normalizedQuery&&!`${event.title} ${event.english||''}`.toLocaleLowerCase('zh-CN').includes(normalizedQuery))return false;
+    return true;
+  });
+  const activeFilterLabel=[selectedDay==='all'?'':weekdayNames[selectedDay],selectedCategory==='all'?'':categoryLabels[selectedCategory],courseQuery.trim()].filter(Boolean).join('-');
+  const exportFileName=`JBJI-${degreeLabels[track]}-大${['一','二','三','四'][year-1]}-${selectedMajor.label}${classCount?`-${classNo}班`:''}${activeFilterLabel?`-${activeFilterLabel}`:''}-2026-27第一学期`;
 
   async function renderScheduleCanvas(){
     if(!scheduleRef.current)throw new Error('找不到课表区域');
@@ -177,17 +195,21 @@ export default function Home(){
       {classCount>0&&<div className="filterGroup classGroup"><span>班级</span><div className="segmented">{Array.from({length:classCount},(_,i)=>i+1).map((item)=><button key={item} className={classNo===item?'active':''} onClick={()=>setClassNo(item)}>{item} 班</button>)}</div></div>}
     </section>
     <section className="contextBar"><span>正在查看</span><strong>{degreeLabels[track]} · 大{['一','二','三','四'][year-1]} · {selectedMajor.name}{classCount?` · ${classNo} 班`:''}</strong><small>{track==='single'&&year<=3?'已替换为单学位伯大必修模块':year===1?'英语分组已按 E1–E12 对应到专业班级':year===2?'雅思分组已按 E1–E8 对应到专业班级':'本年级不区分英语班级组'}</small></section>
-    <section className="scheduleSection" ref={scheduleRef}><div className="sectionHead"><div><p className="eyebrow">{degreeLabels[track].toUpperCase()} · YEAR {year} · {groupLabel}</p><h2>{selectedMajor.name} · {degreeLabels[track]}课表</h2></div><div className="sectionTools"><div className="legend"><span><i className="dot common"/>伯大课程</span><span><i className="dot shared"/>专业共享</span><span><i className="dot own"/>暨大课程</span><span><i className="dot optional"/>选修课程</span></div><div className="exportActions" data-export-exclude><button disabled={exporting!==null} onClick={()=>exportSchedule('png')}>{exporting==='png'?'生成中…':'导出图片'}</button><button className="primary" disabled={exporting!==null} onClick={()=>exportSchedule('pdf')}>{exporting==='pdf'?'生成中…':'导出 PDF'}</button><span className="exportStatus" role="status" aria-live="polite">{exportMessage}</span></div></div></div>
-      <div className="scheduleBody"><aside className="dayFilterPanel" aria-label="按上课日查看" data-export-exclude><span>上课日</span><div className="dayFilterButtons"><button className={selectedDay==='all'?'active':''} aria-pressed={selectedDay==='all'} onClick={()=>setSelectedDay('all')}>全部</button>{weekdayNames.map((day,index)=><button className={selectedDay===index?'active':''} aria-pressed={selectedDay===index} onClick={()=>setSelectedDay(index)} key={day}>{['一','二','三','四','五'][index]}</button>)}</div></aside>
+    <section className="scheduleSection" ref={scheduleRef}><div className="sectionHead"><div><p className="eyebrow">{degreeLabels[track].toUpperCase()} · YEAR {year} · {groupLabel}</p><h2>{selectedMajor.name} · {degreeLabels[track]}课表</h2></div><div className="sectionTools"><div className="legend"><span><i className="dot uob"/>伯大</span><span><i className="dot jnu"/>暨大</span><span><i className="dot english"/>英语</span><span><i className="dot general"/>通识课</span></div><div className="exportActions" data-export-exclude><button disabled={exporting!==null} onClick={()=>exportSchedule('png')}>{exporting==='png'?'生成中…':'导出图片'}</button><button className="primary" disabled={exporting!==null} onClick={()=>exportSchedule('pdf')}>{exporting==='pdf'?'生成中…':'导出 PDF'}</button><span className="exportStatus" role="status" aria-live="polite">{exportMessage}</span></div></div></div>
+      <div className="scheduleBody"><aside className="dayFilterPanel" aria-label="课表内容筛选" data-export-exclude>
+        <div className="sideFilterGroup"><span>上课日</span><div className="dayFilterButtons"><button className={selectedDay==='all'?'active':''} aria-pressed={selectedDay==='all'} onClick={()=>setSelectedDay('all')}>全部</button>{weekdayNames.map((day,index)=><button className={selectedDay===index?'active':''} aria-pressed={selectedDay===index} onClick={()=>setSelectedDay(index)} key={day}>{['一','二','三','四','五'][index]}</button>)}</div></div>
+        <div className="sideFilterGroup"><span>课程类别</span><div className="categoryFilterButtons"><button className={selectedCategory==='all'?'active':''} aria-pressed={selectedCategory==='all'} onClick={()=>setSelectedCategory('all')}>全部</button>{(Object.keys(categoryLabels) as CourseCategory[]).map((category)=><button className={selectedCategory===category?'active':''} aria-pressed={selectedCategory===category} onClick={()=>setSelectedCategory(category)} key={category}>{categoryLabels[category]}</button>)}</div></div>
+        <div className="sideFilterGroup searchFilter"><label htmlFor="course-search">搜索课程</label><input id="course-search" type="search" value={courseQuery} onChange={(event)=>setCourseQuery(event.target.value)} placeholder="输入课程名称" autoComplete="off"/><small>{displayedEvents.length} 个课表时段</small></div>
+      </aside>
       <div className="scheduleContent"><div className="tableScroll"><div className="timetable" style={{gridTemplateColumns:displayedDays.length===1?'72px minmax(480px,1fr)':'72px repeat(5,minmax(165px,1fr))',minWidth:displayedDays.length===1?'620px':'960px'}}><div className="corner">节次</div>{displayedDays.map((day,index)=><div className="dayHead" style={{gridColumn:index+2}} key={day}>{weekdayNames[day]}<small>{weekdayShort[day]}</small></div>)}
         {times.map(([session,from,to],index)=><div className={`timeCell ${session==='5'?'break':''}`} style={{gridRow:index+2}} key={session}><strong>{session}</strong><span>{from}</span>{to&&<small>{to}</small>}</div>)}
         {times.map((_,row)=>displayedDays.map((day,index)=><div className={`gridCell ${row===4?'break':''}`} style={{gridColumn:index+2,gridRow:row+2}} key={`${day}-${row}`}/>))}
-        {displayedEvents.map((event)=><article className={`courseBlock tone-${event.kind}`} style={{gridColumn:displayedDays.indexOf(event.day)+2,gridRow:`${event.start+2} / span ${event.span}`,width:`calc((100% - 6px) / ${event.laneCount})`,marginLeft:`calc(${event.lane} * (100% / ${event.laneCount}) + 3px)`}} key={event.id} title={event.note}><span className="courseTag">{event.note||kindLabels[event.kind]}{trackLabel(event)&&` · ${trackLabel(event)}`}{audienceLabel(event)&&` · (${audienceLabel(event)})`}</span><strong>{event.title}</strong>{event.english&&<small className="courseEnglish">{event.english}</small>}{eventDetails(event)&&<small className="courseDetails">{eventDetails(event)}</small>}</article>)}
+        {displayedEvents.map((event)=><article className={`courseBlock category-${courseCategory(event)}`} style={{gridColumn:displayedDays.indexOf(event.day)+2,gridRow:`${event.start+2} / span ${event.span}`,width:`calc((100% - 6px) / ${event.laneCount})`,marginLeft:`calc(${event.lane} * (100% / ${event.laneCount}) + 3px)`}} key={event.id} title={event.note}><span className="courseTag">{categoryLabels[courseCategory(event)]}{event.note&&` · ${event.note}`}{trackLabel(event)&&` · ${trackLabel(event)}`}{audienceLabel(event)&&` · (${audienceLabel(event)})`}</span><strong>{event.title}</strong>{event.english&&<small className="courseEnglish">{event.english}</small>}{eventDetails(event)&&<small className="courseDetails">{eventDetails(event)}</small>}</article>)}
       </div></div>
-      {displayedEvents.length===0&&<div className="emptyState">{selectedDay==='all'?'当前组合暂无已公布上课时间的课程。':`${weekdayNames[selectedDay]}暂无已公布上课时间的课程。`}</div>}</div></div>
+      {displayedEvents.length===0&&<div className="emptyState">没有找到符合当前筛选条件的课程，请尝试切换类别或清除搜索内容。</div>}</div></div>
       <p className="exportFootnote" data-export-only>JBJI STUDENT TIMETABLE · 2026–27 学年第一学期 · 数据仅供参考，最终安排以学院最新通知为准。</p>
     </section>
-    <section className="courseSection"><div className="sectionHead compact"><div><p className="eyebrow">COURSE OVERVIEW</p><h2>本组合课程清单</h2></div><strong className="countBadge">{courses.length} 门</strong></div><div className="courseList">{courses.map((course)=><article className={`courseItem tone-${course.kind}`} key={course.title}><div><span>{kindLabels[course.kind]}{trackLabel(course)&&` · ${trackLabel(course)}`}{audienceLabel(course)&&` · (${audienceLabel(course)})`}</span><strong>{course.title}</strong>{course.english&&<small className="courseEnglish">{course.english}</small>}{courseDetails(course,filtered)&&<small className="courseDetails">{courseDetails(course,filtered)}</small>}</div></article>)}</div></section>
+    <section className="courseSection"><div className="sectionHead compact"><div><p className="eyebrow">COURSE OVERVIEW</p><h2>本组合课程清单</h2></div><strong className="countBadge">{courses.length} 门</strong></div><div className="courseList">{courses.map((course)=><article className={`courseItem category-${courseCategory(course)}`} key={course.title}><div><span>{categoryLabels[courseCategory(course)]}{trackLabel(course)&&` · ${trackLabel(course)}`}{audienceLabel(course)&&` · (${audienceLabel(course)})`}</span><strong>{course.title}</strong>{course.english&&<small className="courseEnglish">{course.english}</small>}{courseDetails(course,filtered)&&<small className="courseDetails">{courseDetails(course,filtered)}</small>}</div></article>)}</div></section>
     <aside className="notice"><strong>使用说明</strong><p>双学位模式采用原课表中的 All Progs 数学模块；单学位模式会移除这些模块及其 Seminar，并换成单学位授课安排中的 RA、SAS、FM、MVA、GTMCD 与 IPCO。其他暨大学位课程仍按年级、专业和班级筛选。教室或周次有调整时，以学院最新通知为准。</p></aside>
     <footer><span>JBJI STUDENT TIMETABLE · 非官方学生工具</span><span>数据来源：双学位总课表及单学位伯大必修课程授课安排</span><a href="https://birmingham.jnu.edu.cn/" target="_blank" rel="noreferrer">学院官网 ↗</a></footer>
   </main>;

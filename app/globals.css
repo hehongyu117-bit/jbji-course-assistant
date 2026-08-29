@@ -68,19 +68,24 @@ h1 { margin:0; max-width:800px; font-family:Georgia,"Songti SC",serif; font-size
 .exportActions button:disabled { cursor:wait; opacity:.58; }
 .exportStatus { min-width:76px; color:var(--muted); font-size:8px; text-align:left; }
 .dot { width:8px; height:8px; border-radius:50%; }
-.dot.common { background:var(--orange); }
-.dot.shared { background:var(--red); }
-.dot.own { background:var(--blue); }
-.dot.optional { background:#666; }
+.dot.uob { background:var(--orange); }
+.dot.jnu { background:var(--blue); }
+.dot.english { background:var(--red); }
+.dot.general { background:#66855a; }
 .scheduleBody { display:flex; align-items:stretch; gap:12px; }
 .scheduleContent { min-width:0; flex:1; }
-.dayFilterPanel { flex:0 0 94px; padding:13px 10px; border:1px solid #dedede; border-top:3px solid var(--orange); border-radius:3px; background:#f7f7f4; }
-.dayFilterPanel>span { display:block; margin:0 0 10px 2px; color:var(--orange); font-size:9px; font-weight:900; letter-spacing:.13em; }
+.dayFilterPanel { flex:0 0 122px; padding:13px 10px; border:1px solid #dedede; border-top:3px solid var(--orange); border-radius:3px; background:#f7f7f4; }
+.sideFilterGroup + .sideFilterGroup { margin-top:18px; padding-top:15px; border-top:1px solid #dddeda; }
+.sideFilterGroup>span,.searchFilter>label { display:block; margin:0 0 10px 2px; color:var(--orange); font-size:9px; font-weight:900; letter-spacing:.13em; }
 .dayFilterButtons { display:grid; grid-template-columns:1fr; gap:6px; }
-.dayFilterButtons button { min-height:34px; padding:5px 8px; border:1px solid #d9ddd8; border-radius:3px; color:#555; background:#fff; font-size:10px; font-weight:800; cursor:pointer; transition:.18s ease; }
-.dayFilterButtons button:hover { color:var(--orange); border-color:var(--orange); transform:translateY(-1px); }
-.dayFilterButtons button:focus-visible { outline:3px solid #ffd2a8; outline-offset:2px; }
-.dayFilterButtons button.active { color:#fff; border-color:var(--orange); background:var(--orange); box-shadow:inset 0 -3px 0 var(--orange-bright),0 5px 12px rgba(231,120,23,.18); }
+.categoryFilterButtons { display:grid; grid-template-columns:1fr; gap:6px; }
+.dayFilterButtons button,.categoryFilterButtons button { min-height:34px; padding:5px 8px; border:1px solid #d9ddd8; border-radius:3px; color:#555; background:#fff; font-size:10px; font-weight:800; cursor:pointer; transition:.18s ease; }
+.dayFilterButtons button:hover,.categoryFilterButtons button:hover { color:var(--orange); border-color:var(--orange); transform:translateY(-1px); }
+.dayFilterButtons button:focus-visible,.categoryFilterButtons button:focus-visible,.searchFilter input:focus-visible { outline:3px solid #ffd2a8; outline-offset:2px; }
+.dayFilterButtons button.active,.categoryFilterButtons button.active { color:#fff; border-color:var(--orange); background:var(--orange); box-shadow:inset 0 -3px 0 var(--orange-bright),0 5px 12px rgba(231,120,23,.18); }
+.searchFilter input { width:100%; height:36px; padding:0 8px; border:1px solid #d9ddd8; border-radius:3px; background:#fff; color:#333; font:inherit; font-size:9px; }
+.searchFilter input::placeholder { color:#999; }
+.searchFilter small { display:block; margin:7px 2px 0; color:var(--muted); font-size:8px; line-height:1.35; }
 .tableScroll { overflow:auto; border:1px solid #ccd3ce; border-radius:2px; box-shadow:inset 0 0 0 1px #fff; }
 .timetable { min-width:960px; display:grid; grid-template-columns:72px repeat(5,minmax(165px,1fr)); grid-template-rows:50px repeat(12,58px); position:relative; background:#fff; }
 .corner,.dayHead { background:#333; color:#fff; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:800; }
@@ -106,6 +111,10 @@ h1 { margin:0; max-width:800px; font-family:Georgia,"Songti SC",serif; font-size
 .tone-major { background:#e9eef8; border-color:var(--blue); }
 .tone-optional { background:#eeeeee; border-color:#666; }
 .tone-general { background:#edf4ea; border-color:#66855a; }
+.category-uob { background:#fff0e3; border-color:var(--orange); }
+.category-jnu { background:#e9eef8; border-color:var(--blue); }
+.category-english { background:#fde8ed; border-color:var(--red); }
+.category-general { background:#edf4ea; border-color:#66855a; }
 .emptyState { padding:36px; text-align:center; color:var(--muted); font-size:12px; }
 .exportFootnote { display:none; margin:14px 0 0; padding-top:10px; border-top:1px solid var(--line); color:var(--muted); font-size:9px; text-align:right; letter-spacing:.03em; }
 .countBadge { padding:7px 11px; border-radius:2px; background:var(--orange); color:#fff; font-family:Georgia,serif; font-size:11px; }
@@ -144,10 +153,12 @@ footer a:hover { text-decoration:underline; }
   .exportActions { justify-content:flex-start; flex-wrap:wrap; }
   .exportStatus { flex-basis:100%; min-height:12px; }
   .scheduleBody { flex-direction:column; gap:9px; }
-  .dayFilterPanel { flex-basis:auto; padding:10px; }
-  .dayFilterPanel>span { margin-bottom:8px; }
+  .dayFilterPanel { flex-basis:auto; padding:10px; display:grid; grid-template-columns:1fr 1fr minmax(150px,.8fr); gap:10px; }
+  .sideFilterGroup + .sideFilterGroup { margin-top:0; padding-top:0; padding-left:10px; border-top:0; border-left:1px solid #dddeda; }
+  .sideFilterGroup>span,.searchFilter>label { margin-bottom:8px; }
   .dayFilterButtons { grid-template-columns:repeat(6,minmax(0,1fr)); gap:5px; }
-  .dayFilterButtons button { min-height:32px; padding:4px; }
+  .categoryFilterButtons { grid-template-columns:repeat(5,minmax(0,1fr)); gap:5px; }
+  .dayFilterButtons button,.categoryFilterButtons button { min-height:32px; padding:4px; }
   .scheduleSection,.courseSection { padding:14px; }
   .hero,.filterPanel,.contextBar,.scheduleSection,.courseSection,.notice,footer { width:min(100% - 24px,1240px); }
   h1 { font-size:38px; }
@@ -162,4 +173,8 @@ footer a:hover { text-decoration:underline; }
   .notice p { margin-top:6px; }
   footer { display:block; text-align:left; }
   footer span,footer a { display:block; margin-top:6px; }
+}
+@media(max-width:620px) {
+  .dayFilterPanel { grid-template-columns:1fr; }
+  .sideFilterGroup + .sideFilterGroup { padding-left:0; padding-top:12px; border-left:0; border-top:1px solid #dddeda; }
 }
