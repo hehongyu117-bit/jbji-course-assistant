@@ -12,7 +12,7 @@ button { color:inherit; }
 .brandCopy strong { font-family:Georgia,"Songti SC",serif; font-size:19px; line-height:1.1; letter-spacing:.01em; }
 .brandCopy small { margin-top:6px; color:var(--muted); font-size:9px; font-weight:800; letter-spacing:.13em; }
 .topbarMascot { width:92px; height:60px; margin:-2px 2px -2px auto; overflow:hidden; border-left:1px solid #eee5dc; background:#fff; }
-.topbarMascot img { display:block; width:92px; height:72px; object-fit:cover; object-position:50% 23%; transform:scale(1.06); transform-origin:center 25%; }
+.topbarMascot img { display:block; width:100%; height:100%; object-fit:contain; object-position:center; }
 .hero,.filterPanel,.contextBar,.scheduleSection,.courseSection,.notice { width:min(1240px,calc(100% - 40px)); margin-inline:auto; }
 .hero { position:relative; min-height:420px; padding:54px 56px 42px; display:flex; justify-content:space-between; align-items:flex-end; gap:34px; overflow:hidden; background:#fff5ef; border-bottom:7px solid var(--orange); }
 .hero::before,.hero::after { content:""; position:absolute; z-index:1; width:12px; height:145%; top:-20%; background:var(--orange); transform:rotate(39deg); }
@@ -190,7 +190,7 @@ footer a:hover { text-decoration:underline; }
   .brandCopy strong { font-size:16px; }
   .brandCopy small { margin-top:5px; font-size:7.5px; }
   .topbarMascot { width:70px; height:52px; margin-right:0; }
-  .topbarMascot img { width:70px; height:64px; }
+  .topbarMascot img { width:100%; height:100%; }
   .notice { display:block; }
   .notice p { margin-top:6px; }
   footer { display:block; text-align:left; }
