@@ -13,8 +13,8 @@ button { color:inherit; }
 .brandCopy small { margin-top:6px; color:var(--muted); font-size:9px; font-weight:800; letter-spacing:.13em; }
 .topbarMascot { width:92px; height:60px; margin:-2px 2px -2px auto; overflow:hidden; border-left:1px solid #eee5dc; background:#fff; }
 .topbarMascot img { display:block; width:100%; height:100%; object-fit:contain; object-position:center; }
-.hero,.filterPanel,.contextBar,.scheduleSection,.courseSection,.notice { width:min(1240px,calc(100% - 40px)); margin-inline:auto; }
-.hero { position:relative; min-height:420px; padding:54px 56px 42px; display:flex; justify-content:space-between; align-items:flex-end; gap:34px; overflow:hidden; background:#fff5ef; border-bottom:7px solid var(--orange); }
+.hero,.filterPanel,.contextBar,.calendarPanel,.scheduleSection,.courseSection,.notice { width:min(1240px,calc(100% - 40px)); margin-inline:auto; }
+.hero { position:relative; min-height:270px; padding:32px 44px 28px; display:flex; justify-content:space-between; align-items:flex-end; gap:30px; overflow:hidden; background:#fff5ef; border-bottom:6px solid var(--orange); }
 .hero::before,.hero::after { content:""; position:absolute; z-index:1; width:12px; height:145%; top:-20%; background:var(--orange); transform:rotate(39deg); }
 .hero::before { left:57%; }
 .hero::after { left:59%; width:4px; }
@@ -23,15 +23,15 @@ button { color:inherit; }
 .heroBackdrop img { width:100%; height:100%; object-fit:cover; object-position:center; }
 .heroCopy,.heroStat { position:relative; z-index:2; }
 .eyebrow { margin:0 0 12px; color:var(--orange); font-size:10px; font-weight:900; letter-spacing:.16em; }
-h1 { margin:0; max-width:800px; font-family:Georgia,"Songti SC",serif; font-size:clamp(40px,5.5vw,72px); line-height:1.06; letter-spacing:-.035em; font-weight:600; }
+h1 { margin:0; max-width:800px; font-family:Georgia,"Songti SC",serif; font-size:clamp(34px,4vw,52px); line-height:1.06; letter-spacing:-.035em; font-weight:600; }
 .lead { max-width:700px; margin:20px 0 0; color:var(--muted); font-size:14px; line-height:1.8; }
-.hero .lead { max-width:590px; color:#5e5e5e; }
-.heroRule { display:flex; gap:0; margin-top:28px; color:#333; font-size:10px; letter-spacing:.08em; }
+.hero .lead { max-width:640px; margin-top:14px; color:#5e5e5e; line-height:1.65; }
+.heroRule { display:flex; gap:0; margin-top:17px; color:#333; font-size:9px; letter-spacing:.08em; }
 .heroRule span { padding:0 13px; border-left:1px solid #c7c7c7; }
 .heroRule span:first-child { padding-left:0; border-left:0; }
-.heroStat { min-width:150px; padding:20px 24px; color:#fff; background:rgba(231,120,23,.94); text-align:right; box-shadow:10px 10px 0 rgba(255,255,255,.72); }
+.heroStat { min-width:132px; padding:15px 19px; color:#fff; background:rgba(231,120,23,.94); text-align:right; box-shadow:8px 8px 0 rgba(255,255,255,.72); }
 .heroStat strong,.heroStat span,.heroStat small { display:block; }
-.heroStat strong { font-family:Georgia,serif; font-size:64px; color:#fff; line-height:1; }
+.heroStat strong { font-family:Georgia,serif; font-size:48px; color:#fff; line-height:1; }
 .heroStat span,.heroStat small { color:#fff; font-size:9px; letter-spacing:.12em; }
 .heroStat small { margin-top:5px; }
 .filterPanel { position:relative; z-index:6; margin-top:-20px; background:#fff; border:1px solid #dedede; border-top:4px solid var(--orange); border-radius:2px; padding:20px; display:grid; grid-template-columns:auto auto 1fr auto; gap:18px; box-shadow:0 18px 38px rgba(35,35,35,.09); }
@@ -52,6 +52,20 @@ h1 { margin:0; max-width:800px; font-family:Georgia,"Songti SC",serif; font-size
 .contextBar { margin-top:12px; padding:11px 16px; display:flex; align-items:center; gap:10px; color:#c8c8c8; font-size:9px; letter-spacing:.04em; background:#333; border-left:5px solid var(--orange); }
 .contextBar strong { color:#fff; font-size:11px; }
 .contextBar small { margin-left:auto; }
+.calendarPanel { margin-top:10px; padding:15px 17px; display:flex; align-items:center; justify-content:space-between; gap:18px; border:1px solid #d8d2c7; border-left:5px solid var(--orange); border-radius:4px; background:#fff; box-shadow:0 8px 24px rgba(35,46,40,.05); }
+.calendarStatus span,.calendarStatus strong,.calendarStatus small { display:block; }
+.calendarStatus span { color:var(--orange); font-size:8px; font-weight:900; letter-spacing:.12em; }
+.calendarStatus strong { margin-top:4px; font-family:Georgia,"Songti SC",serif; font-size:18px; }
+.calendarStatus small { margin-top:4px; color:var(--muted); font-size:9px; line-height:1.45; }
+.calendarControls { display:flex; align-items:end; gap:7px; }
+.calendarControls label span { display:block; margin:0 0 5px 2px; color:var(--muted); font-size:8px; font-weight:850; }
+.calendarControls select,.calendarControls button { min-height:38px; border:1px solid #d8d8d8; border-radius:3px; background:#f7f7f4; font-size:10px; font-weight:800; }
+.calendarControls select { min-width:205px; padding:7px 30px 7px 10px; }
+.calendarControls button { padding:7px 13px; cursor:pointer; }
+.calendarControls button:hover:not(:disabled) { color:var(--orange); border-color:var(--orange); }
+.calendarControls button.primary { color:#fff; border-color:var(--orange); background:var(--orange); }
+.calendarControls button:disabled { cursor:not-allowed; opacity:.48; }
+.calendarControls select:focus-visible,.calendarControls button:focus-visible { outline:3px solid #ffd2a8; outline-offset:2px; }
 .scheduleSection,.courseSection { padding:26px; background:#fff; border:1px solid #d8d2c7; border-radius:4px; box-shadow:0 8px 25px rgba(35,46,40,.045); }
 .scheduleSection { width:min(1420px,calc(100% - 40px)); margin-top:10px; padding:0; border:0; background:transparent; box-shadow:none; }
 .courseSection { margin-top:18px; }
@@ -188,13 +202,41 @@ h1 { margin:0; max-width:800px; font-family:Georgia,"Songti SC",serif; font-size
 .emptyState { padding:36px; text-align:center; color:var(--muted); font-size:12px; }
 .exportFootnote { display:none; margin:14px 0 0; padding-top:10px; border-top:1px solid var(--line); color:var(--muted); font-size:9px; text-align:right; letter-spacing:.03em; }
 .countBadge { padding:7px 11px; border-radius:2px; background:var(--orange); color:#fff; font-family:Georgia,serif; font-size:11px; }
+.sectionHint { margin:7px 0 0; color:var(--muted); font-size:9px; }
 .courseList { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
-.courseItem { border:1px solid var(--line); border-left-width:4px; border-radius:3px; padding:13px 14px; }
+.courseItem { min-height:150px; border:1px solid var(--line); border-left-width:4px; border-radius:3px; padding:13px 14px; display:flex; flex-direction:column; }
 .courseItem span,.courseItem strong,.courseItem small { display:block; }
 .courseItem span { color:var(--muted); font-size:8px; font-weight:800; }
 .courseItem strong { font-size:12px; margin-top:4px; }
 .courseItem small { font-size:9px; color:var(--muted); margin-top:3px; }
 .courseItem .courseDetails { margin-top:6px; line-height:1.55; font-weight:700; }
+.localReviewPreview { margin:12px 0 0; padding:10px 11px; border-radius:3px; color:#555; background:#f7f5f0; font-size:9.5px; line-height:1.6; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.courseItemActions { margin-top:auto; padding-top:12px; display:flex; align-items:center; justify-content:space-between; gap:12px; }
+.courseItemActions small { margin:0; }
+.courseItemActions button { padding:7px 10px; border:1px solid #333; border-radius:3px; color:#fff; background:#333; font-size:9px; font-weight:850; cursor:pointer; }
+.courseItemActions button:hover { border-color:var(--orange); background:var(--orange); }
+.courseItemActions button:focus-visible { outline:3px solid #ffd2a8; outline-offset:2px; }
+.reviewOverlay { position:fixed; inset:0; z-index:100; display:grid; place-items:center; padding:28px; background:rgba(20,20,20,.58); backdrop-filter:blur(5px); }
+.reviewDialog { width:min(680px,100%); max-height:calc(100vh - 56px); overflow:auto; border-top:5px solid var(--orange); border-radius:8px; background:#fff; box-shadow:0 24px 70px rgba(0,0,0,.3); }
+.reviewDialog>header { padding:20px 22px 16px; display:flex; align-items:flex-start; justify-content:space-between; gap:20px; border-bottom:1px solid var(--line); }
+.reviewDialog>header p { margin:0; color:var(--orange); font-size:8px; font-weight:900; letter-spacing:.14em; }
+.reviewDialog>header h2 { margin:5px 0 0; font-family:Georgia,"Songti SC",serif; font-size:25px; }
+.reviewDialog>header small { display:block; margin-top:4px; color:var(--muted); font-size:9px; }
+.reviewDialog>header button { width:34px; height:34px; border:1px solid var(--line); border-radius:50%; background:#fff; font-size:22px; line-height:1; cursor:pointer; }
+.reviewDialog>header button:hover { color:var(--orange); border-color:var(--orange); }
+.reviewLocalNotice { margin:16px 22px 0; padding:10px 12px; border-left:4px solid var(--orange); background:#fff5ed; color:var(--muted); font-size:9px; line-height:1.55; }
+.reviewLocalNotice strong { color:var(--orange); }
+.reviewDialog form { padding:18px 22px 22px; }
+.reviewDialog label { display:block; margin-bottom:8px; font-size:10px; font-weight:850; }
+.reviewDialog textarea { width:100%; resize:vertical; min-height:170px; padding:13px 14px; border:1px solid #cbc7c0; border-radius:5px; outline:none; font:inherit; font-size:11px; line-height:1.7; }
+.reviewDialog textarea:focus { border-color:var(--orange); box-shadow:0 0 0 3px #fff0e3; }
+.reviewFormMeta { min-height:22px; margin-top:7px; display:flex; justify-content:space-between; gap:15px; color:var(--muted); font-size:8px; }
+.reviewFormMeta span:last-child { color:#9b4c0b; }
+.reviewActions { margin-top:12px; display:flex; justify-content:flex-end; gap:8px; }
+.reviewActions button { padding:9px 15px; border:1px solid #d2d2d2; border-radius:3px; background:#f7f7f4; font-size:10px; font-weight:850; cursor:pointer; }
+.reviewActions button.primary { color:#fff; border-color:var(--orange); background:var(--orange); }
+.reviewActions button:hover { border-color:var(--orange); }
+.reviewActions button:focus-visible,.reviewDialog>header button:focus-visible { outline:3px solid #ffd2a8; outline-offset:2px; }
 .notice { margin-top:13px; padding:16px 18px; border:1px solid #ead8c8; border-left:5px solid var(--orange); border-radius:2px; background:#fff5ed; display:flex; gap:15px; align-items:flex-start; }
 .notice strong { font-size:11px; white-space:nowrap; color:var(--orange); }
 .notice p { margin:0; color:var(--muted); font-size:10px; line-height:1.7; }
@@ -208,6 +250,7 @@ footer a:hover { text-decoration:underline; }
   .majorGroup .segmented { display:grid; grid-template-columns:1fr 1fr; }
   .majorGroup .segmented button { min-width:0; }
   .contextBar small { display:none; }
+  .calendarPanel { align-items:flex-start; }
   .courseList { grid-template-columns:1fr; }
   .scheduleBody { grid-template-columns:1fr; }
   .courseSidebar { min-height:auto; }
@@ -229,7 +272,12 @@ footer a:hover { text-decoration:underline; }
   .exportStatus { flex-basis:100%; min-height:12px; }
   .scheduleBody { gap:10px; }
   .timetablePanel,.courseSection { padding:14px; }
-  .hero,.filterPanel,.contextBar,.scheduleSection,.courseSection,.notice,footer { width:min(100% - 24px,1240px); }
+  .hero,.filterPanel,.contextBar,.calendarPanel,.scheduleSection,.courseSection,.notice,footer { width:min(100% - 24px,1240px); }
+  .calendarPanel { display:block; }
+  .calendarControls { margin-top:12px; align-items:stretch; flex-wrap:wrap; }
+  .calendarControls label { flex:1 1 100%; }
+  .calendarControls select { width:100%; }
+  .calendarControls button { flex:1; }
   h1 { font-size:38px; }
   .topbar { min-height:64px; padding:6px 12px; }
   .brand { gap:10px; }

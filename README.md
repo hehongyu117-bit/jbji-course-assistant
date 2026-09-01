@@ -2,7 +2,7 @@
 
 面向 JBJI 本科生的课表筛选页面。可以按双学位/单学位、年级、专业和班级查看专属课程，数据来自 2026–27 学年第一学期课表与单学位伯大必修课程授课安排。
 
-在线访问：<https://hehongyu117-bit.github.io/jbji-course-assistant/>
+在线访问：<https://miraeina.github.io/jbji-course-assistant/>
 
 ## 本地运行
 
